@@ -10,21 +10,54 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "No content is provided" }, { status: 400 });
     }
 
-    const prompt = `
-        Erstelle eine FAQ-Sektion mit 5–10 relevanten Fragen und Antworten basierend auf folgendem Website-Text:
-        "${content.slice(0, 6000)}"
-    `
 
     try {
-        const response = await openai.chat.completions.create({
+        const completion = await openai.chat.completions.create({
             model: "gpt-4o-mini",
-            messages: [{ role: "user", content: prompt }],
+            messages: [
+                {
+                role: "system",
+                content:
+                    "Du bist ein hilfreiches Tool, das aus Website-Texten strukturierte FAQs erzeugt.",
+                },
+                {
+                role: "user",
+                content: `Erstelle 5–8 häufig gestellte Fragen und Antworten basierend auf folgendem Website-Text:\n${content.slice(
+                    0,
+                    6000
+                )}`,
+                },
+            ],
+            response_format: {
+                type: "json_schema",
+                json_schema: {
+                name: "faq_schema",
+                schema: {
+                    type: "object",
+                    properties: {
+                    faqs: {
+                        type: "array",
+                        items: {
+                        type: "object",
+                        properties: {
+                            question: { type: "string" },
+                            answer: { type: "string" },
+                        },
+                        required: ["question", "answer"],
+                        },
+                    },
+                    },
+                    required: ["faqs"],
+                },
+                },
+            },
         });
 
-        const faq = response.choices[0].message?.content;
-        return Response.json({ faq });
+        const structured = JSON.parse(completion.choices[0].message.content ?? "{}");
+        return Response.json(structured);
     } catch (error) {
         console.log(error);
         return Response.json({ error: "Error while Generating" }, { status: 500 });
     }
 }
+
