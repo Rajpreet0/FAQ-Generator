@@ -1,8 +1,6 @@
-
+import HomeView from "@/modules/home/ui/views/home-view";;
+/* LANDING PAGE */
 export default function Home() {
-  return (
-    <div>
-        Hello World
-    </div>
-  );
+
+  return <HomeView/>
 }
