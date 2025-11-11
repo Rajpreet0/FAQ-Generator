@@ -1,6 +1,5 @@
-"use client"
-import { motion } from "framer-motion"; 
-
+"use client";
+import { motion } from "framer-motion";
 
 const LoadingView = () => {
   return (
@@ -16,7 +15,7 @@ const LoadingView = () => {
         Generating your FAQ...
       </p>
     </main>
-  )
-}
+  );
+};
 
-export default LoadingView
+export default LoadingView;

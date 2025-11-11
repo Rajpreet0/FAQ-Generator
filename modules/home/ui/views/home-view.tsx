@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -8,16 +8,14 @@ import { Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 const HomeView = () => {
+  const [url, setUrl] = useState("");
+  const router = useRouter();
 
-    const [url, setUrl] = useState("");
-    const router = useRouter();
-
-
-    const handleGenerate = (e?: React.FormEvent) => {
-      e?.preventDefault();
-      if (!url) return;
-      router.push(`/result?url=${encodeURIComponent(url)}`);
-    }
+  const handleGenerate = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!url) return;
+    router.push(`/result?url=${encodeURIComponent(url)}`);
+  };
 
   return (
     <main className="min-h-screen flex flex-col justify-center items-center relative overflow-hidden bg-gradient-to-br from-slate-50 via-white to-slate-100 text-slate-800 px-6">
@@ -36,7 +34,8 @@ const HomeView = () => {
           FAQ Generator
         </h1>
         <p className="mt-4 text-lg text-slate-600">
-          Paste your website URL — we’ll analyze it and generate a custom FAQ section with AI ⚡
+          Paste your website URL — we’ll analyze it and generate a custom FAQ
+          section with AI ⚡
         </p>
 
         <form
@@ -65,7 +64,7 @@ const HomeView = () => {
         © 2025 FAQGen — Built with ⚡ by You
       </footer>
     </main>
-  )
-}
+  );
+};
 
-export default HomeView
+export default HomeView;
