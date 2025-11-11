@@ -10,7 +10,7 @@ const HomeView = () => {
 
     const [url, setUrl] = useState("");
     const [loading, setLoading] = useState(false);
-    const [result, setResult] = useState("");
+    const [faq, setFaq] = useState("");
     
     const handleGenerate = async () => {
       setLoading(true);
@@ -21,7 +21,14 @@ const HomeView = () => {
         });
 
         const { content } = await extractRes.json();
-        setResult(content);
+
+        const generateRes = await fetch("/api/generate", {
+          method: "POST",
+          body: JSON.stringify({ content }),
+        });
+
+        const { faq } = await generateRes.json();
+        setFaq(faq);
       } catch (err) {
         console.log(err);
       } finally {
@@ -53,7 +60,12 @@ const HomeView = () => {
         </Button>
       </div>
       <div>
-          {result}
+          {faq && (
+            <div className="mt-8 max-w-2xl whitespace-pre-wrap text-left">
+              <h2 className="text-xl font-semibold mb-2">Generierte FAQ:</h2>
+              <p>{faq}</p>
+            </div>
+          )}
       </div>
     </div> 
   )
