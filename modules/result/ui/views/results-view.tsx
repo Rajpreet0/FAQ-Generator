@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { CircleQuestionMark, ClipboardCopy } from "lucide-react";
 import LoadingView from "@/components/LoadingView";
-
+import { useFaqStore } from "@/store/faq-store";
 
 interface FAQItem {
   question: string;
@@ -14,54 +14,63 @@ interface FAQItem {
 }
 
 const ResultsView = () => {
+  const params = useSearchParams();
+  const url = params.get("url");
+  const { faqs: storedFaqs, setFaqs, clearFaqs } = useFaqStore();
 
-    const params = useSearchParams();
-    const url = params.get("url");
-    const [faq, setFaq] = useState<FAQItem[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [copied, setCopied] = useState(false);
+  const [faq, setFaq] = useState<FAQItem[]>(storedFaqs || []);
+  const [loading, setLoading] = useState(faq.length === 0);
+  const [copied, setCopied] = useState(false);
 
-    useEffect(() => {
-        if (!url) return;
+  useEffect(() => {
 
-        const generateFAQ = async () => {
-            try {
-                const extractRes = await fetch("/api/extract", {
-                    method: "POST",
-                    body: JSON.stringify({ url }),
-                });
-                
-                const { content } = await extractRes.json();
-
-                const generateRes = await fetch("/api/generate", {
-                    method: "POST",
-                    body: JSON.stringify({ content }),
-                });
-
-
-                const data = await generateRes.json();
-                console.log(data);
-                setFaq(data.faqs || []);
-            } catch (error) {
-                console.log(error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        generateFAQ();
-    }, [url]);
-
-    const handleCopy = async () => {
-        await navigator.clipboard.writeText(JSON.stringify(faq, null, 2));
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+    if (storedFaqs && storedFaqs.length > 0) {
+      setFaq(storedFaqs);
+      setLoading(false);
+      return;
     }
 
-    if (loading) {
-        return <LoadingView/>
-    }
+    if (!url) return;
 
+    const generateFAQ = async () => {
+      try {
+        const extractRes = await fetch("/api/extract", {
+          method: "POST",
+          body: JSON.stringify({ url }),
+        });
+
+        const { content } = await extractRes.json();
+
+        const generateRes = await fetch("/api/generate", {
+          method: "POST",
+          body: JSON.stringify({ content }),
+        });
+
+        const data = await generateRes.json();
+
+        const faqs = data.faqs || [];
+        setFaq(faqs);
+        setFaqs(faqs);  // Zustand 
+        useFaqStore.getState().setFaqs(faqs);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    generateFAQ();
+  }, [url, storedFaqs, setFaqs]);
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(JSON.stringify(faq, null, 2));
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  if (loading) {
+    return <LoadingView />;
+  }
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 text-slate-800 px-6 py-16 flex flex-col items-center relative overflow-hidden">
@@ -78,7 +87,27 @@ const ResultsView = () => {
           ✨ Generierte FAQ
         </h1>
 
-        <div className="space-y-6">
+        <div className="flex flex-col gap-2 justify-between md:flex-row md:gap-0">
+          <Button
+            onClick={() => {
+              clearFaqs();
+              window.location.reload();
+            }}
+            className="bg-slate-200 hover:bg-slate-300 text-slate-700 px-6 py-2 rounded-xl shadow-sm"
+          >
+            FAQ neu generieren
+          </Button>
+
+          <Button
+            onClick={handleCopy}
+            className="flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-cyan-400 hover:from-indigo-600 hover:to-cyan-500 text-white font-semibold px-6 py-2 rounded-xl shadow-md hover:shadow-lg transition-all"
+          >
+            <ClipboardCopy size={18} />
+            {copied ? "Kopiert!" : "FAQ exportieren"}
+          </Button>
+        </div>
+
+        <div className="space-y-6 mt-4">
           {faq.map((item) => (
             <motion.div
               key={item.question}
@@ -90,7 +119,7 @@ const ResultsView = () => {
               <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-all bg-gradient-to-r from-indigo-500/10 via-cyan-400/10 to-purple-500/10 blur-xl"></div>
 
               <h3 className="text-lg flex items-center gap-2 font-semibold text-indigo-600 relative z-10">
-                <CircleQuestionMark/> {item.question}
+                <CircleQuestionMark /> {item.question}
               </h3>
               <p className="mt-2   text-slate-700 leading-relaxed relative z-10">
                 {item.answer}
@@ -99,18 +128,9 @@ const ResultsView = () => {
           ))}
         </div>
 
-        <div className="mt-8 flex justify-end">
-          <Button
-            onClick={handleCopy}
-            className="flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-cyan-400 hover:from-indigo-600 hover:to-cyan-500 text-white font-semibold px-6 py-2 rounded-xl shadow-md hover:shadow-lg transition-all"
-          >
-            <ClipboardCopy size={18} />
-            {copied ? "Kopiert!" : "FAQ exportieren"}
-          </Button>
-        </div>
       </motion.div>
     </main>
-  )
-}
+  );
+};
 
-export default ResultsView
+export default ResultsView;

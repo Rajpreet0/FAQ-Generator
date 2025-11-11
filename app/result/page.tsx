@@ -1,7 +1,7 @@
-import ResultsView from "@/modules/result/ui/views/results-view"
+import ResultsView from "@/modules/result/ui/views/results-view";
 
 const Result = () => {
-  return <ResultsView/>
-}
+  return <ResultsView />;
+};
 
-export default Result
+export default Result;
