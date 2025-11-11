@@ -3,71 +3,68 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Spinner } from "@/components/ui/spinner";
+import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const HomeView = () => {
 
     const [url, setUrl] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [faq, setFaq] = useState("");
-    
-    const handleGenerate = async () => {
-      setLoading(true);
-      try {
-        const extractRes = await fetch("/api/extract", {
-          method: "POST",
-          body: JSON.stringify({ url }),
-        });
+    const router = useRouter();
 
-        const { content } = await extractRes.json();
 
-        const generateRes = await fetch("/api/generate", {
-          method: "POST",
-          body: JSON.stringify({ content }),
-        });
-
-        const { faq } = await generateRes.json();
-        setFaq(faq);
-      } catch (err) {
-        console.log(err);
-      } finally {
-        setLoading(false);
-      }
-    };
+    const handleGenerate = (e?: React.FormEvent) => {
+      e?.preventDefault();
+      if (!url) return;
+      router.push(`/result?url=${encodeURIComponent(url)}`);
+    }
 
   return (
-    <div className="w-full min-h-screen flex flex-col justify-center items-center">
-      <div className="flex justify-center items-center w-full gap-4 ">
-        <Input 
-          type="text"
-          className="max-w-lg"
-          placeholder="Website URL"
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-        />
-        <Button
-          className="cursor-pointer"
-          onClick={handleGenerate}
+    <main className="min-h-screen flex flex-col justify-center items-center relative overflow-hidden bg-gradient-to-br from-slate-50 via-white to-slate-100 text-slate-800 px-6">
+      {/* Glow Circles */}
+      <div className="absolute top-[-200px] left-[-150px] w-[400px] h-[400px] bg-cyan-300/30 rounded-full blur-[120px]"></div>
+      <div className="absolute bottom-[-200px] right-[-150px] w-[400px] h-[400px] bg-indigo-400/30 rounded-full blur-[120px]"></div>
+
+      {/* Hero Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="text-center max-w-2xl z-10"
+      >
+        <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-400 text-transparent bg-clip-text drop-shadow-[0_0_10px_rgba(99,102,241,0.3)]">
+          FAQ Generator
+        </h1>
+        <p className="mt-4 text-lg text-slate-600">
+          Paste your website URL — we’ll analyze it and generate a custom FAQ section with AI ⚡
+        </p>
+
+        <form
+          onSubmit={handleGenerate}
+          className="mt-10 flex flex-col sm:flex-row justify-center items-center gap-4"
         >
-          {loading ? (
-            <Spinner/>
-          ) : (
-            <>
-             <Sparkles /> Generieren
-            </>
-          )}
-        </Button>
-      </div>
-      <div>
-          {faq && (
-            <div className="mt-8 max-w-2xl whitespace-pre-wrap text-left">
-              <h2 className="text-xl font-semibold mb-2">Generierte FAQ:</h2>
-              <p>{faq}</p>
-            </div>
-          )}
-      </div>
-    </div> 
+          <Input
+            type="url"
+            placeholder="https://example.com"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            className="w-full sm:w-96 p-3 rounded-xl border border-slate-300/60 bg-white/70 backdrop-blur-md text-slate-900 shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all"
+          />
+          <Button
+            onClick={() => handleGenerate()}
+            className="bg-gradient-to-r from-indigo-500 to-cyan-400 hover:from-indigo-600 hover:to-cyan-500 px-6 py-3 rounded-xl text-white font-semibold flex items-center gap-2 shadow-lg shadow-indigo-400/40 hover:shadow-cyan-400/50 transition-all cursor-pointer "
+          >
+            <Sparkles size={18} />
+            Generieren
+          </Button>
+        </form>
+      </motion.div>
+
+      {/* Footer */}
+      <footer className="absolute bottom-6 text-slate-500 text-sm z-10">
+        © 2025 FAQGen — Built with ⚡ by You
+      </footer>
+    </main>
   )
 }
 
