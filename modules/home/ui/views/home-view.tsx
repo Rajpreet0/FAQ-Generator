@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import BackgroundGlow from "../components/BackgroundGlow";
 import BenefitsSection from "../components/BenefitsSection";
 import HowItWorksSection from "../components/HowItWorksSection";
+import Link from "next/link";
 
 const HomeView = () => {
   const [url, setUrl] = useState("");
@@ -107,6 +108,11 @@ const HomeView = () => {
             Jetzt generieren
           </Button>
         </form>
+        <div className="mt-20">
+          <Link href="/developers" className="text-indigo-600 font-medium">
+            API Dokumentation →
+          </Link>
+        </div>
       </section>
 
       {/* Footer */}
