@@ -6,7 +6,7 @@ import LoadingView from "@/components/LoadingView";
 import { useFaqGeneration } from "@/hooks/useFaqGeneration";
 import FaqList from "../components/FaqList";
 import { SeoScoreCard } from "../components/SeoScoreCard";
-import { MenuDock } from "@/components/ui/shadcn-io/menu-dock";
+import GradientHeading from "@/components/GradientHeading";
 
 const ResultsView = () => {
   const params = useSearchParams();
@@ -32,9 +32,9 @@ const ResultsView = () => {
       <div className="w-full max-w-7xl">
 
         <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-400 text-transparent bg-clip-text">
-            ✨ Generierte FAQ
-          </h1>
+          <GradientHeading
+            heading="✨ Generierte FAQ"
+          />
 
           <div className="flex w-full md:w-auto gap-3">
             {/*TODO: Open Modal to regenerate */}
