@@ -6,6 +6,7 @@ import LoadingView from "@/components/LoadingView";
 import { useFaqGeneration } from "@/hooks/useFaqGeneration";
 import FaqList from "../components/FaqList";
 import { SeoScoreCard } from "../components/SeoScoreCard";
+import { MenuDock } from "@/components/ui/shadcn-io/menu-dock";
 
 const ResultsView = () => {
   const params = useSearchParams();
@@ -36,6 +37,7 @@ const ResultsView = () => {
           </h1>
 
           <div className="flex w-full md:w-auto gap-3">
+            {/*TODO: Open Modal to regenerate */}
             <Button
               onClick={() => {
                 clearFaqs();
