@@ -9,6 +9,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
+import { useSettingsStore } from "@/store/useSettingsStore";
 import {   Brain,
   Languages,
   TextQuote,
@@ -20,10 +21,29 @@ import {   Brain,
   Settings2,
   Save, } from "lucide-react";
 import { useTheme } from "next-themes";
+import { toast } from "sonner";
 
 const SettingsView = () => {
 
   const { theme, setTheme } = useTheme();
+  const {
+    email,
+    name,
+    language,
+    faqCount,
+    tone,
+    model,
+    exportFormat,
+
+    setEmail,
+    setName,
+    setLanguage,
+    setFaqCount,
+    setTone,
+    setModel,
+    setExportFormat
+  } = useSettingsStore();
+  const settings = useSettingsStore();
 
 
   return (
@@ -58,12 +78,20 @@ const SettingsView = () => {
               <CardContent className="space-y-6">
                 <div>
                   <Label>Name</Label>
-                  <Input placeholder="Dein Name" className="mt-1" />
+                  <Input 
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Dein Name" 
+                    className="mt-1" />
                 </div>
 
                 <div>
                   <Label>E-Mail</Label>
-                  <Input placeholder="you@example.com" className="mt-1" />
+                  <Input 
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@example.com" 
+                    className="mt-1" />
                 </div>
 
                 <Button variant="destructive" className="w-full flex gap-2 cursor-pointer">
@@ -126,7 +154,10 @@ const SettingsView = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Select defaultValue="de">
+                <Select 
+                  value={language}
+                  onValueChange={setLanguage}
+                  defaultValue="de">
                   <SelectTrigger>
                     <SelectValue placeholder="Wähle die Sprache" />
                   </SelectTrigger>
@@ -149,10 +180,20 @@ const SettingsView = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Slider defaultValue={[6]} min={3} max={12} step={1} />
-                <p className="text-xs opacity-60 mt-2">
-                  Wähle zwischen 3 und 12 FAQs
-                </p>
+                <Slider 
+                   value={[faqCount]}
+                   min={3} 
+                   max={12} 
+                   step={1}
+                   onValueChange={(v) => setFaqCount(v[0])}/>
+                <div className="w-full flex justify-between items-center">
+                  <p className="text-xs opacity-60 mt-2">
+                    Wähle zwischen 3 und 12 FAQs 
+                  </p>
+                  <p className="text-sm opacity-60 mt-2">
+                    {faqCount} / 12
+                  </p>
+                </div>
               </CardContent>
             </Card>
 
@@ -165,7 +206,10 @@ const SettingsView = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Select defaultValue="professional">
+                <Select 
+                  value={tone}
+                  onValueChange={setTone}
+                  defaultValue="professional">
                   <SelectTrigger>
                     <SelectValue placeholder="Ton auswählen" />
                   </SelectTrigger>
@@ -189,7 +233,10 @@ const SettingsView = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Select defaultValue="gpt-4o-mini">
+                <Select 
+                  value={model}
+                  onValueChange={setModel}
+                  defaultValue="gpt-4o-mini">
                   <SelectTrigger>
                     <SelectValue placeholder="Modell wählen" />
                   </SelectTrigger>
@@ -212,7 +259,11 @@ const SettingsView = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <RadioGroup defaultValue="json" className="space-y-2">
+                <RadioGroup  
+                  value={exportFormat}
+                  onValueChange={setExportFormat}
+                  defaultValue="json" 
+                  className="space-y-2">
                   <div className="flex items-center space-x-3">
                     <RadioGroupItem value="json" id="json" />
                     <Label htmlFor="json">JSON</Label>
@@ -229,11 +280,16 @@ const SettingsView = () => {
               </CardContent>
             </Card>
 
-            <Button className="
-              w-full mt-2 py-6 text-lg font-semibold rounded-2xl
-              bg-gradient-to-r from-indigo-500 to-cyan-400 text-white shadow-indigo-400/40 hover:shadow-cyan-400/50
-              flex items-center justify-center gap-2 mb-18 cursor-pointer
-            ">
+            <Button 
+              onClick={() => { 
+                console.log("Gespeicherte Settings:", settings)
+                toast.success("Änderungen wurden gespeichert")
+              }}
+              className="
+                w-full mt-2 py-6 text-lg font-semibold rounded-2xl
+                bg-gradient-to-r from-indigo-500 to-cyan-400 text-white shadow-indigo-400/40 hover:shadow-cyan-400/50
+                flex items-center justify-center gap-2 mb-18 cursor-pointer
+              ">
               <Save className="w-5 h-5" />
               Änderungen speichern
             </Button>
