@@ -7,16 +7,39 @@ import { useFaqGeneration } from "@/hooks/useFaqGeneration";
 import FaqList from "../components/FaqList";
 import { SeoScoreCard } from "../components/SeoScoreCard";
 import GradientHeading from "@/components/GradientHeading";
+import { toast } from "sonner";
+import { useFaqStore } from "@/store/faq-store";
+import { useSettingsStore } from "@/store/useSettingsStore";
+import { exportHTML, exportJSON, exportPDF } from "@/utils/exportFaq";
 
 const ResultsView = () => {
   const params = useSearchParams();
   const url = params.get("url");
   const { faq, seoData, loading, clearFaqs, seoLoading } = useFaqGeneration(url);
+  const { faqs } = useFaqStore();
+  const { exportFormat } = useSettingsStore();
   const router = useRouter();
 
-  const handleCopy = async () => {
-    await navigator.clipboard.writeText(JSON.stringify(faq, null, 2));
-  };
+  function handleExport() {
+    if (!faqs || faqs.length === 0) return;
+
+    switch(exportFormat) {
+      case "json":
+        exportJSON(faqs);
+        toast.success("JSON Exported!");
+        break;
+      case "html":
+        exportHTML(faqs);
+        toast.success("HTML Exported!");
+        break;
+      case "pdf":
+        exportPDF(faqs);
+        toast.success("PDF Exported!");
+        break;
+      default:
+        exportJSON(faqs);
+    }
+  }
 
   if (loading) return <LoadingView />;
 
@@ -52,14 +75,14 @@ const ResultsView = () => {
             </Button>
 
             <Button
-              onClick={handleCopy}
+              onClick={handleExport}
               className="
                 flex-1 flex items-center justify-center gap-2 py-3 rounded-xl 
                 bg-gradient-to-r from-indigo-500 to-cyan-400 hover:from-indigo-600 hover:to-cyan-500 text-white
               "
             >
               <ClipboardCopy size={18} />
-              Exportieren
+              Exportieren ({exportFormat.toUpperCase()})
             </Button>
           </div>
         </div>
