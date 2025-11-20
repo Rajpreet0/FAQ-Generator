@@ -9,8 +9,9 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
+import { useAuthStore } from "@/store/auth-store";
 import { useSettingsStore } from "@/store/useSettingsStore";
-import {   Brain,
+import { Brain,
   Languages,
   TextQuote,
   MonitorCog,
@@ -21,6 +22,8 @@ import {   Brain,
   Settings2,
   Save, } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { toast } from "sonner";
 
 const SettingsView = () => {
@@ -45,7 +48,17 @@ const SettingsView = () => {
   } = useSettingsStore();
   const settings = useSettingsStore();
 
+  const logout = useAuthStore((s) => s.logout);
+  const user = useAuthStore((s) => s.user);
+  const router = useRouter();
 
+  useEffect(() => {
+    if (!user) return;
+
+    setName(user.user_metadata?.name ?? "");
+    setEmail(user.email ?? "");
+  }, [setName, setEmail, user]);
+  
   return (
     <main
       className="min-h-screen px-6 py-12 flex flex-col items-center relative overflow-hidden
@@ -94,7 +107,12 @@ const SettingsView = () => {
                     className="mt-1" />
                 </div>
 
-                <Button variant="destructive" className="w-full flex gap-2 cursor-pointer">
+                <Button
+                 onClick={async () => {
+                    await logout();
+                    router.push("/");
+                 }}
+                 variant="destructive" className="w-full flex gap-2 cursor-pointer">
                   <LogOut className="w-4 h-4" />
                   Logout
                 </Button>

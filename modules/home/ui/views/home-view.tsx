@@ -11,9 +11,12 @@ import BenefitsSection from "../components/BenefitsSection";
 import HowItWorksSection from "../components/HowItWorksSection";
 import Link from "next/link";
 import ThemeToggle from "@/components/ThemeToggle";
+import { useAuthStore } from "@/store/auth-store";
+import AuthAvatar from "@/modules/auth/ui/components/AuthAvatar";
 
 const HomeView = () => {
   const [url, setUrl] = useState("");
+  const user = useAuthStore((s) => s.user);
   const router = useRouter();
 
   const handleGenerate = (e?: React.FormEvent) => {
@@ -29,6 +32,23 @@ const HomeView = () => {
         dark:bg-gradient-to-br dark:from-[#0b0f19] dark:via-[#0e1220] dark:to-[#0b0f19]
         dark:text-slate-200
         transition-all">
+      {/* Auth Button */}
+      <div className="p-4 w-full flex justify-end">
+        {user ? (
+          <AuthAvatar />
+        ) : (
+          <Button
+            className="cursor-pointer bg-gradient-to-r from-indigo-500 to-indigo-600
+                text-white shadow-lg shadow-indigo-400/40 hover:shadow-cyan-400/50
+                dark:shadow-indigo-900/40 dark:hover:shadow-cyan-900/50
+                transition-all"
+            onClick={() => router.push("/auth")}
+          >
+            Login
+          </Button>
+        )}
+      </div>
+
       {/* Background Glow */}
       <BackgroundGlow/>
       
