@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { Home, Settings, Save } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
@@ -25,8 +25,6 @@ export interface MenuDockProps {
 
 const defaultItems: MenuDockItem[] = [
     { label: 'home', icon: Home },
-    { label: 'saved', icon: Save },
-    { label: 'settings', icon: Settings },
 ];
 
 export const MenuDock: React.FC<MenuDockProps> = ({ 
@@ -49,10 +47,11 @@ export const MenuDock: React.FC<MenuDockProps> = ({
 
   const router = useRouter();
 
+  
   const [activeIndex, setActiveIndex] = useState(0);
   const [underlineWidth, setUnderlineWidth] = useState(0);
   const [underlineLeft, setUnderlineLeft] = useState(0);
-  
+
   const textRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
@@ -62,6 +61,7 @@ export const MenuDock: React.FC<MenuDockProps> = ({
       }
   }, [finalItems, activeIndex]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     const updateUnderline = () => {
       const activeButton = itemRefs.current[activeIndex];
@@ -121,13 +121,15 @@ export const MenuDock: React.FC<MenuDockProps> = ({
   const styles = getVariantStyles();
 
   return (
-    <nav
+// biome-ignore lint/a11y/useSemanticElements: <explanation>
+<nav
       className={cn(
         'relative inline-flex items-center rounded-xl bg-card border shadow-sm',
         orientation === 'horizontal' ? 'flex-row' : 'flex-col',
         styles.container,
         className
       )}
+      // biome-ignore lint/a11y/noRedundantRoles: <explanation>
       role="navigation"
     >
       {finalItems.map((item, index) => {

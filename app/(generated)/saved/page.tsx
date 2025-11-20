@@ -1,9 +1,11 @@
+import Protected from "@/components/Protected"
+import SavedView from "@/modules/saved/ui/views/saved-view"
 
 const Saved = () => {
   return (
-    <div>
-        <p>Saved</p>
-    </div>
+    <Protected>
+      <SavedView/>
+    </Protected>
   )
 }
 
