@@ -46,18 +46,31 @@ const SettingsView = () => {
     setModel,
     setExportFormat
   } = useSettingsStore();
-  const settings = useSettingsStore();
 
   const logout = useAuthStore((s) => s.logout);
   const user = useAuthStore((s) => s.user);
   const router = useRouter();
+  const loadSettings = useSettingsStore((s) => s.loadSettings);
+  const saveSettings = useSettingsStore((s) => s.saveSettings);
 
   useEffect(() => {
     if (!user) return;
 
     setName(user.user_metadata?.name ?? "");
     setEmail(user.email ?? "");
-  }, [setName, setEmail, user]);
+
+    // Load settings from database
+    loadSettings();
+  }, [setName, setEmail, user, loadSettings]);
+
+  const handleSave = async () => {
+    const success = await saveSettings();
+    if (success) {
+      toast.success("Änderungen wurden gespeichert");
+    } else {
+      toast.error("Fehler beim Speichern");
+    }
+  };
   
   return (
     <main
@@ -298,11 +311,8 @@ const SettingsView = () => {
               </CardContent>
             </Card>
 
-            <Button 
-              onClick={() => { 
-                console.log("Gespeicherte Settings:", settings)
-                toast.success("Änderungen wurden gespeichert")
-              }}
+            <Button
+              onClick={handleSave}
               className="
                 w-full mt-2 py-6 text-lg font-semibold rounded-2xl
                 bg-gradient-to-r from-indigo-500 to-cyan-400 text-white shadow-indigo-400/40 hover:shadow-cyan-400/50

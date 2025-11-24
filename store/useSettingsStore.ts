@@ -11,7 +11,7 @@ interface SettingsState {
     tone: string;
     model: string;
     exportFormat: string;
-    
+
     setEmail: (v: string) => void;
     setName: (v: string) => void;
 
@@ -21,13 +21,15 @@ interface SettingsState {
     setModel: (v: string) => void;
     setExportFormat: (v: string) => void;
 
+    loadSettings: () => Promise<void>;
+    saveSettings: () => Promise<boolean>;
     resetSettings: () => void;
 }
 
 
 export const useSettingsStore = create(
     persist<SettingsState>(
-        (set) => ({
+        (set, get) => ({
             // DEFAULT VALUES
             email: "",
             name: "",
@@ -46,7 +48,46 @@ export const useSettingsStore = create(
             setModel: (v) => set({ model: v }),
             setExportFormat: (v) => set({ exportFormat: v }),
 
-            resetSettings: () => 
+            loadSettings: async () => {
+                try {
+                    const response = await fetch('/api/settings');
+                    if (response.ok) {
+                        const data = await response.json();
+                        set({
+                            language: data.language || "de",
+                            faqCount: data.faqCount || 6,
+                            tone: data.tone || "professional",
+                            model: data.model || "gpt-4o-mini",
+                            exportFormat: data.exportFormat || "json",
+                        });
+                    }
+                } catch (error) {
+                    console.error('Failed to load settings:', error);
+                }
+            },
+
+            saveSettings: async () => {
+                try {
+                    const state = get();
+                    const response = await fetch('/api/settings', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            language: state.language,
+                            faqCount: state.faqCount,
+                            tone: state.tone,
+                            model: state.model,
+                            exportFormat: state.exportFormat,
+                        })
+                    });
+                    return response.ok;
+                } catch (error) {
+                    console.error('Failed to save settings:', error);
+                    return false;
+                }
+            },
+
+            resetSettings: () =>
                 set({
                     language: "de",
                     faqCount: 6,

@@ -61,6 +61,11 @@ export const useFaqGeneration = (url: string | null) => {
                 const faqs = data.faqs || [];
                 setFaq(faqs);
                 setFaqs(faqs);
+
+                // Store URL for later SEO score update
+                if (typeof window !== 'undefined') {
+                    sessionStorage.setItem('current_faq_url', url);
+                }
             } catch (err) {
                 console.error(err);
             } finally {
@@ -93,6 +98,28 @@ export const useFaqGeneration = (url: string | null) => {
                 const data = await res.json();
                 setLocalSeoData(data);
                 setSeoData(data);
+
+                // Auto-save FAQs with SEO score to database
+                if (typeof window !== 'undefined') {
+                    const savedUrl = sessionStorage.getItem('current_faq_url');
+                    if (savedUrl) {
+                        try {
+                            await fetch('/api/faqs', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    title: `FAQs from ${new URL(savedUrl).hostname}`,
+                                    sourceUrl: savedUrl,
+                                    seoScore: data.score,
+                                    faqs: faq
+                                })
+                            });
+                            sessionStorage.removeItem('current_faq_url');
+                        } catch {
+                            console.log('Could not auto-save FAQs (user may not be logged in)');
+                        }
+                    }
+                }
             } catch (err) {
                 console.error("SEO Analysis failed:", err);
             } finally {

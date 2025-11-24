@@ -1,7 +1,7 @@
 "use client";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { ClipboardCopy, Loader2 } from "lucide-react";
+import { ClipboardCopy, Loader2, Save } from "lucide-react";
 import LoadingView from "@/components/LoadingView";
 import { useFaqGeneration } from "@/hooks/useFaqGeneration";
 import FaqList from "../components/FaqList";
@@ -13,6 +13,7 @@ import { useSettingsStore } from "@/store/useSettingsStore";
 import { exportHTML, exportJSON, exportPDF } from "@/utils/exportFaq";
 import { useState } from "react";
 import RegenerateModal from "../components/RegenerateModal";
+import { useAuthStore } from "@/store/auth-store";
 
 const ResultsView = () => {
   const params = useSearchParams();
@@ -20,16 +21,54 @@ const ResultsView = () => {
 
   const [currentUrl, setCurrentUrl] = useState<string | null>(null);
   const [regenerateLoading, setRegenerateLoading] = useState(false);
-
+  const [saveLoading, setSaveLoading] = useState(false);
 
   const effectiveUrl = currentUrl || url;
-  
+
   const { faq, seoData, loading, clearFaqs, seoLoading } = useFaqGeneration(effectiveUrl);
-  
+
   const { faqs } = useFaqStore();
   const { exportFormat } = useSettingsStore();
+  const user = useAuthStore((s) => s.user);
 
-  const [open, setOpen] = useState(false); 
+  const [open, setOpen] = useState(false);
+
+  async function handleSaveFaqs() {
+    if (!user) {
+      toast.error("Bitte melde dich an, um FAQs zu speichern");
+      return;
+    }
+
+    if (!faqs || faqs.length === 0) {
+      toast.error("Keine FAQs zum Speichern vorhanden");
+      return;
+    }
+
+    setSaveLoading(true);
+    try {
+      const response = await fetch('/api/faqs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: effectiveUrl ? `FAQs from ${new URL(effectiveUrl).hostname}` : 'Gespeicherte FAQs',
+          sourceUrl: effectiveUrl,
+          seoScore: seoData?.score,
+          faqs: faqs
+        })
+      });
+
+      if (response.ok) {
+        toast.success("FAQs erfolgreich gespeichert!");
+      } else {
+        toast.error("Fehler beim Speichern der FAQs");
+      }
+    } catch (error) {
+      console.error("Error saving FAQs:", error);
+      toast.error("Fehler beim Speichern der FAQs");
+    } finally {
+      setSaveLoading(false);
+    }
+  } 
 
   function handleExport() {
     if (!faqs || faqs.length === 0) return;
@@ -94,7 +133,6 @@ const ResultsView = () => {
             />
 
             <div className="flex w-full md:w-auto gap-3">
-              {/*TODO: Open Modal to regenerate */}
               <Button
                 onClick={() => setOpen(true)}
                 className="
@@ -106,10 +144,28 @@ const ResultsView = () => {
               </Button>
 
               <Button
+                onClick={handleSaveFaqs}
+                disabled={saveLoading || !user}
+                className="
+                  flex-1 flex items-center justify-center gap-2 py-3 rounded-xl
+                  bg-gradient-to-r from-green-500 to-emerald-400 hover:from-green-600 hover:to-emerald-500 text-white
+                  disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer
+                "
+              >
+                {saveLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Save size={18} />
+                )}
+                {saveLoading ? "Speichert..." : "Speichern"}
+              </Button>
+
+              <Button
                 onClick={handleExport}
                 className="
-                  flex-1 flex items-center justify-center gap-2 py-3 rounded-xl 
+                  flex-1 flex items-center justify-center gap-2 py-3 rounded-xl
                   bg-gradient-to-r from-indigo-500 to-cyan-400 hover:from-indigo-600 hover:to-cyan-500 text-white
+                  cursor-pointer
                 "
               >
                 <ClipboardCopy size={18} />
