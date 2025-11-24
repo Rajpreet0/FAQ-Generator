@@ -2,6 +2,30 @@ import { supabase } from "@/lib/supabase";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+// Helper function to sync user to database
+async function syncUserToDb(user: any) {
+    if (!user) return;
+
+    try {
+        const response = await fetch('/api/user/sync', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                id: user.id,
+                email: user.email,
+                name: user.user_metadata?.name,
+                avatarUrl: user.user_metadata?.avatar_url
+            })
+        });
+
+        if (!response.ok) {
+            console.error('Failed to sync user to database');
+        }
+    } catch (error) {
+        console.error('Error syncing user:', error);
+    }
+}
+
 interface AuthState {
     user: any;
     loading: boolean;
@@ -25,7 +49,13 @@ export const useAuthStore = create(
 
             initAuth: async () => {
                 const { data } = await supabase.auth.getUser();
-                set({ user: data?.user ?? null, authReady: true });
+                const user = data?.user ?? null;
+
+                if (user) {
+                    await syncUserToDb(user);
+                }
+
+                set({ user, authReady: true });
             },
 
             login: async (email: string, password: string) => {
@@ -35,7 +65,10 @@ export const useAuthStore = create(
                     password
                 });
 
-                if (!error) set({ user: data.user });
+                if (!error && data.user) {
+                    await syncUserToDb(data.user);
+                    set({ user: data.user });
+                }
                 set({ loading: false });
 
                 return { data, error };
@@ -49,7 +82,10 @@ export const useAuthStore = create(
                     options: { data: { name } }
                 });
 
-                if (!error) set({ user: data.user });
+                if (!error && data.user) {
+                    await syncUserToDb(data.user);
+                    set({ user: data.user });
+                }
                 set({ loading: false });
 
                 return { data, error }
