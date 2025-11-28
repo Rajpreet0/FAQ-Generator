@@ -2,7 +2,21 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getSupabaseUser } from "@/lib/supabase-server";
 
-// GET user settings
+/**
+ * User Settings API Endpoint
+ *
+ * Manages user preferences for FAQ generation including language, count,
+ * tone, AI model selection, and export format preferences.
+ */
+
+/**
+ * GET - Retrieve user settings
+ *
+ * Fetches the authenticated user's settings from the database.
+ * Returns default settings if none exist.
+ *
+ * @returns {Response} User settings object or default configuration
+ */
 export async function GET() {
   try {
     const user = await getSupabaseUser();
@@ -35,7 +49,21 @@ export async function GET() {
   }
 }
 
-// POST/PUT update user settings
+/**
+ * POST - Update user settings
+ *
+ * Creates or updates user settings using upsert operation.
+ * All settings are optional and will be merged with existing values.
+ *
+ * @param {Request} req - The HTTP request containing:
+ *   - language: FAQ output language
+ *   - faqCount: Number of FAQs to generate
+ *   - tone: Writing style preference
+ *   - model: OpenAI model selection
+ *   - exportFormat: Preferred export format
+ *
+ * @returns {Response} Updated settings object or error
+ */
 export async function POST(req: Request) {
   try {
     const user = await getSupabaseUser();

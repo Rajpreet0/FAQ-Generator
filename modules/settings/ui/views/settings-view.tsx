@@ -26,6 +26,31 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { toast } from "sonner";
 
+/**
+ * Settings View Component
+ *
+ * Comprehensive settings page for user account and FAQ generation preferences.
+ * Organizes settings into general and generation-specific sections.
+ *
+ * General Settings:
+ * - Account: Name and email management
+ * - Appearance: Dark mode toggle
+ * - Subscription: Current plan display and upgrade option
+ *
+ * Generation Settings:
+ * - Language: FAQ output language selection (German, English, French, Spanish)
+ * - FAQ Count: Number of FAQs to generate (3-12)
+ * - Tone: Writing style (Professional, Friendly, Humorous, Simple)
+ * - Model: OpenAI model selection (GPT-4o-mini, GPT-4o, GPT-5-mini)
+ * - Export Format: Preferred export format (JSON, HTML, PDF)
+ *
+ * Features:
+ * - Loads settings from database on mount
+ * - Saves settings to backend API
+ * - Syncs with Zustand store for immediate UI updates
+ * - Toast notifications for save success/failure
+ * - Logout functionality
+ */
 const SettingsView = () => {
 
   const { theme, setTheme } = useTheme();

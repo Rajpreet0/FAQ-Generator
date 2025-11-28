@@ -3,6 +3,35 @@ import { motion } from "framer-motion";
 import { useLottie } from "lottie-react";
 import iAnimation from "@/public/iA_Animation.json";
 
+/**
+ * Loading View Component
+ *
+ * Full-screen loading indicator shown during FAQ generation.
+ * Features an animated Lottie animation with gradient background.
+ *
+ * Features:
+ * - Lottie animation (AI/loading themed)
+ * - Smooth fade-in animation with framer-motion
+ * - Radial gradient background glow
+ * - Pulsing text animation
+ * - Dark mode support
+ * - Full-screen centered layout
+ *
+ * Animation Settings:
+ * - Loop: true (continuous animation)
+ * - Autoplay: true
+ * - Size: 180x180px
+ *
+ * Used When:
+ * - FAQ generation is in progress
+ * - Content extraction is ongoing
+ * - SEO analysis is being performed
+ *
+ * Design Elements:
+ * - Gradient background with indigo accent
+ * - Drop shadow on animation for depth
+ * - Centered loading text with pulse effect
+ */
 const LoadingView = () => {
   const options = {
     animationData: iAnimation,

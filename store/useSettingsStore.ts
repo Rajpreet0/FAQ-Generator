@@ -1,6 +1,11 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+/**
+ * Settings Store State Interface
+ *
+ * Defines user preferences and FAQ generation configuration settings.
+ */
 interface SettingsState {
 
     email: string;
@@ -26,7 +31,28 @@ interface SettingsState {
     resetSettings: () => void;
 }
 
-
+/**
+ * User Settings Store
+ *
+ * Zustand store for managing user preferences and FAQ generation settings.
+ * Syncs with backend API and persists to localStorage.
+ *
+ * State:
+ * - email: User email address
+ * - name: User display name
+ * - language: FAQ output language (default: "de")
+ * - faqCount: Number of FAQs to generate (default: 6)
+ * - tone: Writing style/tone (default: "professional")
+ * - model: OpenAI model selection (default: "gpt-5-nano")
+ * - exportFormat: Export file format preference (default: "json")
+ *
+ * Actions:
+ * - setEmail, setName: Update user info
+ * - setLanguage, setFaqCount, setTone, setModel, setExportFormat: Update FAQ settings
+ * - loadSettings: Fetch settings from API and update store
+ * - saveSettings: Persist current settings to API
+ * - resetSettings: Restore default values
+ */
 export const useSettingsStore = create(
     persist<SettingsState>(
         (set, get) => ({
@@ -36,7 +62,7 @@ export const useSettingsStore = create(
             language: "de",
             faqCount: 6,
             tone: "professional",
-            model: "gpt-4o-mini",
+            model: "gpt-5-nano",
             exportFormat: "json",
 
             // ACTIONS

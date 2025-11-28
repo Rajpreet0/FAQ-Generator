@@ -1,10 +1,29 @@
+
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
+/**
+ * FAQ Generation API Endpoint
+ *
+ * Generates structured FAQ items from website content using OpenAI's GPT models.
+ * This endpoint accepts content extracted from a website and returns a JSON array
+ * of question-answer pairs based on user-specified parameters.
+ *
+ * @param {Request} req - The HTTP request containing:
+ *   - content: The website text content to generate FAQs from
+ *   - language: Target language for the FAQs
+ *   - faqCount: Number of FAQ items to generate
+ *   - tone: Writing style (e.g., professional, casual)
+ *   - model: OpenAI model to use for generation
+ *
+ * @returns {Response} JSON response containing:
+ *   - Success: { faqs: Array<{ question: string, answer: string }> }
+ *   - Error: { error: string } with appropriate status code
+ */
 export async function POST(req: Request) {
-  const { content } = await req.json();
+  const { content, language, faqCount, tone, model } = await req.json();
 
   if (!content) {
     return NextResponse.json(
@@ -15,19 +34,19 @@ export async function POST(req: Request) {
 
   try {
     const completion = await openai.chat.completions.create({
-      model: "gpt-5-nano",
+      model: model,
       messages: [
         {
           role: "system",
           content:
-            "Du bist ein hilfreiches Tool, das aus Website-Texten strukturierte FAQs erzeugt.",
+            `Du bist ein hilfreiches Tool, das aus Website-Texten strukturierte FAQs auf ${language} erzeugt.`,
         },
         {
           role: "user",
-          content: `Erstelle 5–8 häufig gestellte Fragen und Antworten basierend auf folgendem Website-Text:\n${content.slice(
+          content: `Erstelle genau ${faqCount} häufig gestellte Fragen und Antworten basierend auf folgendem Website-Text:\n${content.slice(
             0,
             6000,
-          )}`,
+          )} in ${tone} Schreibstil`,
         },
       ],
       response_format: {

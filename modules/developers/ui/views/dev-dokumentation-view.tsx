@@ -5,6 +5,37 @@ import { motion } from "framer-motion";
 import { Copy } from "lucide-react";
 import { toast } from "sonner";
 
+/**
+ * Developer Documentation View Component
+ *
+ * Comprehensive API documentation for the FAQGen Public API.
+ * Provides detailed information about endpoints, parameters, and usage examples.
+ *
+ * Sections:
+ * - Authentication: API key usage via Bearer token
+ * - Endpoint: POST endpoint URL for FAQ generation
+ * - Body Parameters: Detailed parameter descriptions with types
+ * - Example Requests: Code examples in cURL, JavaScript, and Python
+ * - Example Response: Sample JSON response structure
+ *
+ * Features:
+ * - Copy-to-clipboard functionality for code snippets
+ * - Toast notifications on successful copy
+ * - Responsive parameter table
+ * - Syntax-highlighted code blocks
+ * - Multiple language examples for accessibility
+ * - Dynamic API URL from environment variables
+ *
+ * API Parameters:
+ * - url: Website URL to extract content from
+ * - content: Optional raw HTML/text
+ * - language: Output language (default: "de")
+ * - count: Number of FAQs (default: 6)
+ * - tone: Writing style
+ * - topics: Optional topic focus
+ * - structured: JSON vs text response
+ * - includeSeo: Include SEO analysis
+ */
 const DevDokumentationView = () => {
 
     const [copied, setCopied] = useState(false);

@@ -1,12 +1,21 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-
+/**
+ * FAQ Item Interface
+ *
+ * Represents a single FAQ entry with a question and answer pair.
+ */
 export interface FAQItem {
     question: string;
     answer: string;
 }
 
+/**
+ * SEO Data Interface
+ *
+ * Represents the SEO analysis results for FAQ content.
+ */
 export interface SEOData {
   score: number;
   summary: string;
@@ -16,6 +25,11 @@ export interface SEOData {
   estimatedImpact?: string;
 }
 
+/**
+ * FAQ Store State Interface
+ *
+ * Defines the structure of the FAQ store with FAQs, SEO data, and management actions.
+ */
 interface FAQState {
     faqs: FAQItem[];
     seoData: SEOData | null;
@@ -24,6 +38,21 @@ interface FAQState {
     clearFaqs: () => void;
 }
 
+/**
+ * FAQ Store
+ *
+ * Zustand store for managing generated FAQs and their SEO analysis data.
+ * Persists state to localStorage for session continuity.
+ *
+ * State:
+ * - faqs: Array of generated FAQ items
+ * - seoData: SEO analysis results for the current FAQ set
+ *
+ * Actions:
+ * - setFaqs: Update the FAQ array
+ * - setSeoData: Update SEO analysis data
+ * - clearFaqs: Clear all FAQs, SEO data, and localStorage
+ */
 export const useFaqStore = create(
   persist<FAQState>(
     (set) => ({

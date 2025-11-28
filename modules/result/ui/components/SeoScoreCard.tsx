@@ -2,6 +2,29 @@
 import { motion } from "framer-motion";
 import { Check, Lightbulb, Target, TriangleAlert } from "lucide-react";
 
+/**
+ * SEO Score Card Component
+ *
+ * Displays comprehensive SEO analysis results in a visually appealing card format.
+ * Features an animated circular progress indicator and categorized insights.
+ *
+ * Features:
+ * - Animated circular progress ring with gradient colors based on score
+ * - Color-coded score indicator (green: >80, yellow: 60-80, red: <60)
+ * - Categorized sections: Strengths, Weaknesses, Recommendations
+ * - Impact level indicator
+ * - Summary text
+ * - Smooth animations with framer-motion
+ * - Dark mode support
+ *
+ * Score Interpretation:
+ * - 81-100: Excellent (Green) - High SEO impact
+ * - 61-80: Good (Yellow) - Medium SEO impact
+ * - 0-60: Needs Improvement (Red) - Low SEO impact
+ *
+ * @param {Object} props - Component props
+ * @param {Object} props.seoData - SEO analysis data object containing score, summary, strengths, weaknesses, recommendations, and estimatedImpact
+ */
 export const SeoScoreCard = ({ seoData }: { seoData: any }) => {
   const score = seoData?.score || 0;
   

@@ -2,7 +2,14 @@ import { supabase } from "@/lib/supabase";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-// Helper function to sync user to database
+/**
+ * User Database Synchronization Helper
+ *
+ * Synchronizes authenticated user data from Supabase to the application database.
+ * Called after login, registration, or session initialization to ensure data consistency.
+ *
+ * @param {any} user - Supabase user object with id, email, and metadata
+ */
 async function syncUserToDb(user: any) {
     if (!user) return;
 
@@ -26,6 +33,11 @@ async function syncUserToDb(user: any) {
     }
 }
 
+/**
+ * Authentication Store State Interface
+ *
+ * Defines the structure of the authentication store with user data and auth methods.
+ */
 interface AuthState {
     user: any;
     loading: boolean;
@@ -38,6 +50,25 @@ interface AuthState {
     logout: () => Promise<void>;
 }
 
+/**
+ * Authentication Store
+ *
+ * Zustand store for managing user authentication state using Supabase.
+ * Handles login, registration, logout, and session initialization.
+ * Automatically syncs user data to the application database.
+ *
+ * State:
+ * - user: Current authenticated user object or null
+ * - loading: Boolean indicating ongoing auth operations
+ * - authReady: Boolean indicating auth initialization completion
+ *
+ * Actions:
+ * - setUser: Manually set the current user
+ * - initAuth: Initialize authentication by checking existing session
+ * - login: Authenticate user with email and password
+ * - register: Create new user account with name, email, and password
+ * - logout: Sign out current user and clear session
+ */
 export const useAuthStore = create(
     persist<AuthState>(
         (set) => ({
