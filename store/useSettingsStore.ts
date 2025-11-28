@@ -17,6 +17,9 @@ interface SettingsState {
     model: string;
     exportFormat: string;
 
+    apiKey: string | null;
+    apiKeyExpiresAt: string | null;
+
     setEmail: (v: string) => void;
     setName: (v: string) => void;
 
@@ -25,9 +28,11 @@ interface SettingsState {
     setTone: (v: string) => void;
     setModel: (v: string) => void;
     setExportFormat: (v: string) => void;
+    setApiKey: (key: string | null, expiresAt: string | null) => void;
 
     loadSettings: () => Promise<void>;
     saveSettings: () => Promise<boolean>;
+    generateApiKey: () => Promise<{ success: boolean; apiKey?: string; error?: string }>;
     resetSettings: () => void;
 }
 
@@ -64,6 +69,8 @@ export const useSettingsStore = create(
             tone: "professional",
             model: "gpt-5-nano",
             exportFormat: "json",
+            apiKey: null,
+            apiKeyExpiresAt: null,
 
             // ACTIONS
             setEmail: (v) => set({ email: v }),
@@ -73,6 +80,7 @@ export const useSettingsStore = create(
             setTone: (v) => set({ tone: v }),
             setModel: (v) => set({ model: v }),
             setExportFormat: (v) => set({ exportFormat: v }),
+            setApiKey: (key, expiresAt) => set({ apiKey: key, apiKeyExpiresAt: expiresAt }),
 
             loadSettings: async () => {
                 try {
@@ -85,6 +93,8 @@ export const useSettingsStore = create(
                             tone: data.tone || "professional",
                             model: data.model || "gpt-4o-mini",
                             exportFormat: data.exportFormat || "json",
+                            apiKey: data.apiKey || null,
+                            apiKeyExpiresAt: data.apiKeyExpiresAt || null,
                         });
                     }
                 } catch (error) {
@@ -110,6 +120,30 @@ export const useSettingsStore = create(
                 } catch (error) {
                     console.error('Failed to save settings:', error);
                     return false;
+                }
+            },
+
+            generateApiKey: async () => {
+                try {
+                    const response = await fetch('/api/key/generate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        set({
+                            apiKey: data.apiKey,
+                            apiKeyExpiresAt: data.expiresAt,
+                        });
+                        return { success: true, apiKey: data.apiKey };
+                    } else {
+                        const errorData = await response.json();
+                        return { success: false, error: errorData.error || 'Failed to generate API key' };
+                    }
+                } catch (error) {
+                    console.error('Failed to generate API key:', error);
+                    return { success: false, error: 'Network error' };
                 }
             },
 

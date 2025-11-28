@@ -21,24 +21,29 @@ model User {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relations
-  faqs      Faq[]
-  faqSets   FaqSet[]
-  settings  UserSettings?
+  faqs     Faq[]
+  faqSets  FaqSet[]
+  settings UserSettings?
 
   @@map("users")
 }
 
 // User Settings - stores all user preferences except dark mode
 model UserSettings {
-  id           String   @id @default(uuid())
-  userId       String   @unique @map("user_id")
-  language     String   @default("de") // de, en, fr, es
-  faqCount     Int      @default(6) @map("faq_count") // 3-12
-  tone         String   @default("professional") // professional, friendly, funny, simple
-  model        String   @default("gpt-4o-mini") // gpt-4o-mini, gpt-4o, gpt-5-mini
-  exportFormat String   @default("json") @map("export_format") // json, html, pdf
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  id              String    @id @default(uuid())
+  userId          String    @unique @map("user_id")
+  language        String    @default("de") // de, en, fr, es
+  faqCount        Int       @default(6) @map("faq_count") // 3-12
+  tone            String    @default("professional") // professional, friendly, funny, simple
+  model           String    @default("gpt-4o-mini") // gpt-4o-mini, gpt-4o, gpt-5-mini
+  exportFormat    String    @default("json") @map("export_format") // json, html, pdf
+  apiKey          String?   @map("api_key") // User's API key for public API
+  apiKeyCreatedAt DateTime? @map("api_key_created_at") // When the API key was generated
+  apiKeyExpiresAt DateTime? @map("api_key_expires_at") // API key expiration (30 days)
+  apiRequestCount Int       @default(0) @map("api_request_count") // Total request count for current hour
+  apiLastRequest  DateTime? @map("api_last_request") // Last API request timestamp
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
 
   // Relations
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)

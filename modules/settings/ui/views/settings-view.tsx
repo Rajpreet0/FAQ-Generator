@@ -1,3 +1,4 @@
+
 "use client";
 
 import GradientHeading from "@/components/GradientHeading";
@@ -5,28 +6,26 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Slider } from "@/components/ui/slider";
-import { Switch } from "@/components/ui/switch";
 import { useAuthStore } from "@/store/auth-store";
 import { useSettingsStore } from "@/store/useSettingsStore";
-import { generateAPIKey } from "@/utils/generateAPIKey";
-import { Brain,
-  Languages,
-  TextQuote,
-  MonitorCog,
-  FileDown,
-  User,
-  MoonStar,
-  LogOut,
-  Settings2,
+import {
   Save,
-  KeyRound, } from "lucide-react";
-import { useTheme } from "next-themes";
-import { useRouter } from "next/navigation";
+  KeyRound,
+  Copy,
+  Eye,
+  EyeOff,
+  AlertCircle, } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import AccountCard from "../components/account-card";
+import ApperanceCard from "../components/apperance-card";
+import SubscriptionCard from "../components/subscription-card";
+import LanguageCard from "../components/language-card";
+import FaqCountCard from "../components/faqCount-card";
+import ToneCard from "../components/tone-card";
+import ModelCard from "../components/model-card";
+import ExportCard from "../components/export-card";
 
 /**
  * Settings View Component
@@ -55,29 +54,18 @@ import { toast } from "sonner";
  */
 const SettingsView = () => {
 
-  const { theme, setTheme } = useTheme();
-  const [apiKey, setAPIKey] = useState("");
+  const [isGeneratingKey, setIsGeneratingKey] = useState(false);
+  const [showKey, setShowKey] = useState(false);
   const {
-    email,
-    name,
-    language,
-    faqCount,
-    tone,
-    model,
-    exportFormat,
+    apiKey,
+    apiKeyExpiresAt,
 
     setEmail,
     setName,
-    setLanguage,
-    setFaqCount,
-    setTone,
-    setModel,
-    setExportFormat
+    generateApiKey
   } = useSettingsStore();
 
-  const logout = useAuthStore((s) => s.logout);
   const user = useAuthStore((s) => s.user);
-  const router = useRouter();
   const loadSettings = useSettingsStore((s) => s.loadSettings);
   const saveSettings = useSettingsStore((s) => s.saveSettings);
 
@@ -100,12 +88,45 @@ const SettingsView = () => {
     }
   };
 
-  const handleAPIKeyGeneration = () => {
-    const newKey = generateAPIKey(40);
-    setAPIKey(newKey);
-    navigator.clipboard.writeText(apiKey);
-    toast.success("API Key erfolgreich generiert.");
-  }
+  const handleAPIKeyGeneration = async () => {
+    setIsGeneratingKey(true);
+    try {
+      const result = await generateApiKey();
+      if (result.success && result.apiKey) {
+        await navigator.clipboard.writeText(result.apiKey);
+        toast.success("API Key erfolgreich generiert und in die Zwischenablage kopiert!");
+        setShowKey(true);
+      } else {
+        toast.error(result.error || "Fehler beim Generieren des API Keys");
+      }
+    } catch (error) {
+      toast.error("Fehler beim Generieren des API Keys");
+    } finally {
+      setIsGeneratingKey(false);
+    }
+  };
+
+  const handleCopyKey = async () => {
+    if (apiKey) {
+      await navigator.clipboard.writeText(apiKey);
+      toast.success("API Key in die Zwischenablage kopiert!");
+    }
+  };
+
+  const formatExpiryDate = (dateString: string | null) => {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+    return date.toLocaleDateString("de-DE", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
+  const isKeyExpired = () => {
+    if (!apiKeyExpiresAt) return false;
+    return new Date() > new Date(apiKeyExpiresAt);
+  };
   
   return (
     <main
@@ -129,79 +150,13 @@ const SettingsView = () => {
 
           <div className="grid gap-8">
             {/* ACCOUNT CARD */}
-            <Card className="backdrop-blur-md bg-white/70 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 shadow-xl rounded-2xl">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <User className="w-5 h-5 text-indigo-500" />
-                  Account
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  <Label>Name</Label>
-                  <Input 
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Dein Name" 
-                    className="mt-1" />
-                </div>
-
-                <div>
-                  <Label>E-Mail</Label>
-                  <Input 
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@example.com" 
-                    className="mt-1" />
-                </div>
-
-                <Button
-                 onClick={async () => {
-                    await logout();
-                    router.push("/");
-                 }}
-                 variant="destructive" className="w-full flex gap-2 cursor-pointer">
-                  <LogOut className="w-4 h-4" />
-                  Logout
-                </Button>
-              </CardContent>
-            </Card>
+            <AccountCard/>
 
             {/* APPEARANCE */}
-            <Card className="backdrop-blur-md bg-white/70 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 shadow-xl rounded-2xl">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MoonStar className="w-5 h-5 text-indigo-500" />
-                  Erscheinungsbild
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="flex items-center justify-between">
-                <Label className="font-normal opacity-80">Dark Mode aktivieren</Label>
-                <Switch 
-                  checked={theme==="dark"}
-                  onCheckedChange={() => setTheme(theme === "light" ? "dark" : "light")}
-                  className="cursor-pointer"
-                />
-              </CardContent>
-            </Card>
+            <ApperanceCard/>
 
             {/* SUBSCRIPTION */}
-            <Card className="backdrop-blur-md bg-white/70 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 shadow-xl rounded-2xl">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Settings2 className="w-5 h-5 text-indigo-500" />
-                  Abo & Nutzung
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <p className="text-sm opacity-70">
-                  Aktueller Plan: <span className="font-bold text-indigo-600 dark:text-indigo-400">Free</span>
-                </p>
-                <Button className="w-full bg-gradient-to-r from-indigo-500 to-cyan-400 text-white cursor-pointer">
-                  Upgrade
-                </Button>
-              </CardContent>
-            </Card>
+            <SubscriptionCard/>
           </div>
         </section>
         
@@ -212,139 +167,20 @@ const SettingsView = () => {
 
           <div className="grid gap-6">
             {/* LANGUAGE SETTINGS */}
-            <Card className="backdrop-blur-md bg-white/70 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 shadow-xl rounded-2xl">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Languages className="w-5 h-5 text-indigo-500" />
-                  Sprache
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Select 
-                  value={language}
-                  onValueChange={setLanguage}
-                  defaultValue="de">
-                  <SelectTrigger>
-                    <SelectValue placeholder="Wähle die Sprache" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="de">Deutsch</SelectItem>
-                    <SelectItem value="en">Englisch</SelectItem>
-                    <SelectItem value="fr">Französisch</SelectItem>
-                    <SelectItem value="es">Spanisch</SelectItem>
-                  </SelectContent>
-                </Select>
-              </CardContent>
-            </Card>
+            <LanguageCard/>
 
             {/* FAQ COUNT */}
-            <Card className="backdrop-blur-md bg-white/70 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 shadow-xl rounded-2xl">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Brain className="w-5 h-5 text-indigo-500" />
-                  Anzahl der FAQ-Elemente
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Slider 
-                   value={[faqCount]}
-                   min={3} 
-                   max={12} 
-                   step={1}
-                   onValueChange={(v) => setFaqCount(v[0])}/>
-                <div className="w-full flex justify-between items-center">
-                  <p className="text-xs opacity-60 mt-2">
-                    Wähle zwischen 3 und 12 FAQs 
-                  </p>
-                  <p className="text-sm opacity-60 mt-2">
-                    {faqCount} / 12
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+            <FaqCountCard/>
 
             {/* TONE */}
-            <Card className="backdrop-blur-md bg-white/70 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 shadow-xl rounded-2xl">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TextQuote className="w-5 h-5 text-indigo-500" />
-                  Schreibstil
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Select 
-                  value={tone}
-                  onValueChange={setTone}
-                  defaultValue="professional">
-                  <SelectTrigger>
-                    <SelectValue placeholder="Ton auswählen" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="professional">Professionell</SelectItem>
-                    <SelectItem value="friendly">Freundlich</SelectItem>
-                    <SelectItem value="funny">Humorvoll</SelectItem>
-                    <SelectItem value="simple">Einfach</SelectItem>
-                  </SelectContent>
-                </Select>
-              </CardContent>
-            </Card>
-
+            <ToneCard/>
 
             {/* MODEL */}
-            <Card className="backdrop-blur-md bg-white/70 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 shadow-xl rounded-2xl">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MonitorCog className="w-5 h-5 text-indigo-500" />
-                  KI-Modell
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <Select 
-                  value={model}
-                  onValueChange={setModel}
-                  defaultValue="gpt-4o-mini">
-                  <SelectTrigger>
-                    <SelectValue placeholder="Modell wählen" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="gpt-4o-mini">GPT-4o-mini</SelectItem>
-                    <SelectItem value="gpt-4o">GPT-4o</SelectItem>
-                    <SelectItem value="gpt-5-mini">GPT-5-mini</SelectItem>
-                  </SelectContent>
-                </Select>
-              </CardContent>
-            </Card>
+            <ModelCard/>
 
 
             {/* EXPORT SETTINGS */}
-            <Card className="backdrop-blur-md bg-white/70 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 shadow-xl rounded-2xl">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <FileDown className="w-5 h-5 text-indigo-500" />
-                  Exportformat
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <RadioGroup  
-                  value={exportFormat}
-                  onValueChange={setExportFormat}
-                  defaultValue="json" 
-                  className="space-y-2">
-                  <div className="flex items-center space-x-3">
-                    <RadioGroupItem value="json" id="json" />
-                    <Label htmlFor="json">JSON</Label>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <RadioGroupItem value="html" id="html" />
-                    <Label htmlFor="html">HTML</Label>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <RadioGroupItem value="pdf" id="pdf" />
-                    <Label htmlFor="pdf">PDF</Label>
-                  </div>
-                </RadioGroup>
-              </CardContent>
-            </Card>
+            <ExportCard/>
           </div>
         </section>
 
@@ -359,23 +195,84 @@ const SettingsView = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <KeyRound className="w-5 h-5 text-indigo-500" />
-                  API Key
+                  API Key für Public API
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="flex items-center gap-4 ">
-                  <Input
-                    value={apiKey}
-                    disabled
-                    onChange={(e) => setAPIKey(e.target.value)}
-                    placeholder="******************"  />
+              <CardContent className="space-y-4">
+                <p className="text-sm opacity-70">
+                  Generiere einen API Key für die Verwendung der öffentlichen API. Der Key ist 30 Tage gültig und hat ein Limit von 15 Anfragen pro Stunde.
+                </p>
 
-                  <Button
-                    onClick={handleAPIKeyGeneration}
-                    className="cursor-pointer bg-gradient-to-r from-cyan-800 to-cyan-500 text-white shadow-indigo-400/40 hover:shadow-cyan-400/50">
-                    Generate
-                  </Button>
-                </div>
+                {apiKey && (
+                  <>
+                    {isKeyExpired() && (
+                      <div className="flex items-center gap-2 text-red-600 dark:text-red-400 text-sm">
+                        <AlertCircle className="w-4 h-4" />
+                        <span>Dieser API Key ist abgelaufen. Bitte generiere einen neuen Key.</span>
+                      </div>
+                    )}
+
+                    <div className="space-y-2">
+                      <Label>Aktueller API Key</Label>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          value={showKey ? apiKey : "••••••••••••••••••••••••••••••••••••••••"}
+                          disabled
+                          className="font-mono text-sm"
+                        />
+                        <Button
+                          onClick={() => setShowKey(!showKey)}
+                          variant="outline"
+                          size="icon"
+                          className="cursor-pointer">
+                          {showKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </Button>
+                        <Button
+                          onClick={handleCopyKey}
+                          variant="outline"
+                          size="icon"
+                          className="cursor-pointer">
+                          <Copy className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="opacity-70">Gültig bis:</span>
+                      <span className={`font-medium ${isKeyExpired() ? "text-red-600 dark:text-red-400" : "text-green-600 dark:text-green-400"}`}>
+                        {formatExpiryDate(apiKeyExpiresAt)}
+                      </span>
+                    </div>
+                  </>
+                )}
+
+                <Button
+                  onClick={handleAPIKeyGeneration}
+                  disabled={isGeneratingKey}
+                  className="w-full cursor-pointer bg-gradient-to-r from-cyan-800 to-cyan-500 text-white shadow-indigo-400/40 hover:shadow-cyan-400/50 disabled:opacity-50">
+                  <KeyRound className="w-4 h-4 mr-2" />
+                  {apiKey ? "Neuen Key generieren (ersetzt den alten)" : "API Key generieren"}
+                </Button>
+
+                {apiKey && (
+                  <div className="mt-4 p-3 bg-slate-100 dark:bg-slate-800 rounded-lg">
+                    <p className="text-xs opacity-70 mb-2">Beispiel Verwendung:</p>
+                    <code className="text-xs block overflow-x-auto">
+                      curl -X POST https://your-domain.com/api/public/generate \<br />
+                      &nbsp;&nbsp;-H "Authorization: Bearer {apiKey}" \<br />
+                      &nbsp;&nbsp;-H "Content-Type: application/json" \<br />
+                      &nbsp;&nbsp;-d '&#123;"url": "https://example.com"&#125;'
+                    </code>
+                  </div>
+                )}
+
+                {apiKey && (
+                  <div className="mt-2 text-center">
+                    <Link href="/developers" className="text-indigo-600 text-xs hover:underline">
+                      API Dokumentation
+                    </Link>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
