@@ -11,6 +11,7 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { useAuthStore } from "@/store/auth-store";
 import { useSettingsStore } from "@/store/useSettingsStore";
+import { generateAPIKey } from "@/utils/generateAPIKey";
 import { Brain,
   Languages,
   TextQuote,
@@ -20,10 +21,11 @@ import { Brain,
   MoonStar,
   LogOut,
   Settings2,
-  Save, } from "lucide-react";
+  Save,
+  KeyRound, } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 /**
@@ -54,6 +56,7 @@ import { toast } from "sonner";
 const SettingsView = () => {
 
   const { theme, setTheme } = useTheme();
+  const [apiKey, setAPIKey] = useState("");
   const {
     email,
     name,
@@ -96,6 +99,13 @@ const SettingsView = () => {
       toast.error("Fehler beim Speichern");
     }
   };
+
+  const handleAPIKeyGeneration = () => {
+    const newKey = generateAPIKey(40);
+    setAPIKey(newKey);
+    navigator.clipboard.writeText(apiKey);
+    toast.success("API Key erfolgreich generiert.");
+  }
   
   return (
     <main
@@ -333,6 +343,39 @@ const SettingsView = () => {
                     <Label htmlFor="pdf">PDF</Label>
                   </div>
                 </RadioGroup>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        {/* ------------ PUBLIC API GENERATION ------------ */}
+        <section>
+          <h2 className="text-xl font-semibold mb-2">Entwicklungs Einstellungen</h2>
+          <hr className=" mb-6"/>
+
+          <div className="grid gap-6">
+            
+            <Card className="backdrop-blur-md bg-white/70 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 shadow-xl rounded-2xl">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <KeyRound className="w-5 h-5 text-indigo-500" />
+                  API Key
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="flex items-center gap-4 ">
+                  <Input
+                    value={apiKey}
+                    disabled
+                    onChange={(e) => setAPIKey(e.target.value)}
+                    placeholder="******************"  />
+
+                  <Button
+                    onClick={handleAPIKeyGeneration}
+                    className="cursor-pointer bg-gradient-to-r from-cyan-800 to-cyan-500 text-white shadow-indigo-400/40 hover:shadow-cyan-400/50">
+                    Generate
+                  </Button>
+                </div>
               </CardContent>
             </Card>
 

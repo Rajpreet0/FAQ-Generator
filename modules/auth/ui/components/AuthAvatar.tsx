@@ -61,17 +61,19 @@ const AuthAvatar = () => {
 
             <DropdownMenuItem 
                 className="cursor-pointer flex gap-2"
-                onClick={() => router.push("/settings")}
-            >
-                <Settings size={16}/> Einstellungen
-            </DropdownMenuItem>
-
-            <DropdownMenuItem 
-                className="cursor-pointer flex gap-2"
                 onClick={() => router.push("/saved")}
             >
                 <Save size={16}/> Saved
-            </DropdownMenuItem>            
+            </DropdownMenuItem>  
+
+            <DropdownMenuItem 
+                className="cursor-pointer flex gap-2"
+                onClick={() => router.push("/settings")}
+            >
+                <Settings size={16}/> Einstellungen
+            </DropdownMenuItem>          
+            
+            <hr/>
 
             <DropdownMenuItem
                 className="cursor-pointer flex gap-2 text-red-600 hover:text-red-700"
