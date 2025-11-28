@@ -1,26 +1,32 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY!,
 });
 
-const validateKey = (req: Request) => {
-    const auth = req.headers.get("authorization");
-    if (!auth || !auth.startsWith("Bearer ")) return false;
-
-
-    const providedKey = auth.split(" ")[1];
-    return providedKey === process.env.PUBLIC_API_KEY;
-};
-
 export async function POST(req: Request) {
-    if (!validateKey(req)) {
+    // Extract API key from Authorization header
+    const auth = req.headers.get("authorization");
+    if (!auth || !auth.startsWith("Bearer ")) {
         return NextResponse.json(
-            { error: "Unauthorized: invalid or missing key"},
+            { error: "Unauthorized: Missing API key. Use 'Authorization: Bearer YOUR_API_KEY'" },
             { status: 401 }
-        )
+        );
+    }
+
+    const apiKey = auth.split(" ")[1];
+
+    // Validate API key and check rate limit
+    const rateLimitCheck = await checkRateLimit(apiKey);
+
+    if (!rateLimitCheck.isValid) {
+        return NextResponse.json(
+            { error: rateLimitCheck.error || "Unauthorized" },
+            { status: rateLimitCheck.error?.includes("Rate limit") ? 429 : 401 }
+        );
     }
 
     const {
