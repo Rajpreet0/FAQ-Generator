@@ -3,6 +3,8 @@
 import { useFaqStore } from "@/store/faq-store";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 /**
  * FAQ Generation Hook
@@ -36,6 +38,7 @@ export const useFaqGeneration = (url: string | null) => {
     const [seoLoading, setSeoLoading] = useState(!storedSeo);
     const [hydrated, setHydrated] = useState(false);
 
+    const router = useRouter();
     const hasGeneratedRef = useRef(false);
     const hasAnalyzedRef = useRef(false);
 
@@ -79,15 +82,48 @@ export const useFaqGeneration = (url: string | null) => {
 
         const generate = async () => {
             try {
+                // Extract content from website
                 const extractRes = await fetch("/api/extract", {
                     method: "POST",
                     body: JSON.stringify({ url }),
                 });
+
+                // Check if extraction was successful
+                if (!extractRes.ok) {
+                    const errorData = await extractRes.json();
+                    toast.error(errorData.error || "Die Webseite konnte nicht extrahiert werden");
+
+                    // Reset states to allow retry
+                    setLoading(false);
+                    hasGeneratedRef.current = false;
+
+                    // Redirect back to home after 2 seconds
+                    setTimeout(() => {
+                        router.push("/");
+                    }, 2000);
+                    return;
+                }
+
                 const { content } = await extractRes.json();
 
+                // Check if content is empty or too short
+                if (!content || content.trim().length < 50) {
+                    toast.error("Die Webseite konnte nicht extrahiert werden oder enthält zu wenig Text");
+
+                    // Reset states to allow retry
+                    setLoading(false);
+                    hasGeneratedRef.current = false;
+
+                    setTimeout(() => {
+                        router.push("/");
+                    }, 2000);
+                    return;
+                }
+
+                // Generate FAQs from extracted content
                 const genRes = await fetch("/api/generate", {
                     method: "POST",
-                    body: JSON.stringify({ 
+                    body: JSON.stringify({
                         content,
                         language,
                         faqCount,
@@ -96,19 +132,43 @@ export const useFaqGeneration = (url: string | null) => {
                     }),
                 });
 
+                if (!genRes.ok) {
+                    toast.error("Fehler beim Generieren der FAQs");
+
+                    // Reset states to allow retry
+                    setLoading(false);
+                    hasGeneratedRef.current = false;
+
+                    setTimeout(() => {
+                        router.push("/");
+                    }, 2000);
+                    return;
+                }
+
                 const data = await genRes.json();
                 const faqs = data.faqs || [];
                 setFaq(faqs);
                 setFaqs(faqs);
             } catch (err) {
-                console.error(err);
+                console.error("FAQ Generation Error:", err);
+                toast.error("Die Webseite konnte nicht extrahiert werden");
+
+                // Reset states to allow retry
+                setLoading(false);
+                hasGeneratedRef.current = false;
+
+                // Redirect back to home
+                setTimeout(() => {
+                    router.push("/");
+                }, 2000);
             } finally {
+                // Ensure loading is always stopped
                 setLoading(false);
             }
         };
 
         generate();
-    }, [hydrated, storedSeo, url, setFaqs, storedFaqs]);
+    }, [hydrated, storedSeo, url, setFaqs, storedFaqs, router, language, faqCount, tone, model]);
 
     useEffect(() => {
         if (!hydrated || faq.length === 0) return;
