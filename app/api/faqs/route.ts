@@ -2,7 +2,21 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getSupabaseUser } from "@/lib/supabase-server";
 
-// GET all FAQs for current user
+/**
+ * FAQ Management API Endpoint
+ *
+ * Provides CRUD operations for managing user's FAQ sets and individual FAQ items.
+ * All operations require authentication and are scoped to the current user.
+ */
+
+/**
+ * GET - Retrieve all FAQ sets for the authenticated user
+ *
+ * Fetches all FAQ sets with their associated FAQ items, ordered by creation date.
+ * Each FAQ set includes metadata like title, source URL, description, and SEO score.
+ *
+ * @returns {Response} JSON array of FAQ sets with nested FAQ items, or error
+ */
 export async function GET() {
   try {
     const user = await getSupabaseUser();
@@ -31,7 +45,21 @@ export async function GET() {
   }
 }
 
-// POST save new FAQ set
+/**
+ * POST - Create a new FAQ set
+ *
+ * Saves a new FAQ set with associated FAQ items to the database.
+ * Implements duplicate detection to prevent accidental double-saves within 5 seconds.
+ *
+ * @param {Request} req - The HTTP request containing:
+ *   - title: The FAQ set title
+ *   - sourceUrl: (optional) The source website URL
+ *   - description: (optional) FAQ set description
+ *   - seoScore: (optional) SEO score data
+ *   - faqs: Array of { question: string, answer: string } objects
+ *
+ * @returns {Response} The created FAQ set with all items, or error
+ */
 export async function POST(req: Request) {
   try {
     const user = await getSupabaseUser();
@@ -48,6 +76,25 @@ export async function POST(req: Request) {
         { error: "Title and FAQs are required" },
         { status: 400 }
       );
+    }
+
+    // Check for duplicates based on sourceUrl and title to prevent double-saves
+    if (sourceUrl) {
+      const existingSet = await prisma.faqSet.findFirst({
+        where: {
+          userId: user.id,
+          sourceUrl,
+          title,
+          createdAt: {
+            // Only check for duplicates created in the last 5 seconds
+            gte: new Date(Date.now() - 5000),
+          },
+        },
+      });
+
+      if (existingSet) {
+        return NextResponse.json(existingSet, { status: 200 });
+      }
     }
 
     // Create FAQ set with FAQs in a transaction
@@ -84,7 +131,17 @@ export async function POST(req: Request) {
   }
 }
 
-// DELETE FAQ set
+/**
+ * DELETE - Remove a FAQ set
+ *
+ * Deletes a FAQ set and all associated FAQ items.
+ * Verifies ownership before deletion to ensure security.
+ *
+ * @param {Request} req - The HTTP request with query parameter:
+ *   - id: The FAQ set ID to delete
+ *
+ * @returns {Response} { success: true } or error
+ */
 export async function DELETE(req: Request) {
   try {
     const user = await getSupabaseUser();

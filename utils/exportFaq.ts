@@ -2,7 +2,31 @@ import { FAQItem } from "@/store/faq-store";
 import autoTable from "jspdf-autotable";
 import jsPDF from "jspdf";
 
-// -------------- EXPORT JSON --------------
+/**
+ * FAQ Export Utilities
+ *
+ * Provides functions to export FAQ data in multiple formats.
+ * All exports trigger automatic browser downloads.
+ */
+
+/**
+ * Export FAQs as JSON
+ *
+ * Creates a formatted JSON file with FAQ data and triggers download.
+ * JSON is formatted with 2-space indentation for readability.
+ *
+ * @param {FAQItem[]} faqs - Array of FAQ items to export
+ *
+ * Output Format:
+ * ```json
+ * [
+ *   {
+ *     "question": "...",
+ *     "answer": "..."
+ *   }
+ * ]
+ * ```
+ */
 export function exportJSON(faqs: FAQItem[]) {
     const blob = new Blob([JSON.stringify(faqs, null, 2)],  {
         type: "application/json",
@@ -17,7 +41,24 @@ export function exportJSON(faqs: FAQItem[]) {
 }
 
 
-// -------------- EXPORT HTML --------------
+/**
+ * Export FAQs as HTML
+ *
+ * Creates a standalone HTML file with FAQ content and embedded CSS.
+ * Ready to copy-paste into existing websites.
+ *
+ * @param {FAQItem[]} faqs - Array of FAQ items to export
+ *
+ * Features:
+ * - Semantic HTML structure (div.faq-container, h3, p)
+ * - Embedded CSS for immediate styling
+ * - Responsive max-width container
+ *
+ * Output Structure:
+ * - Container div with max-width: 800px
+ * - Each FAQ: h3 (question) + p (answer)
+ * - Sans-serif font family
+ */
 export function exportHTML(faqs: FAQItem[]) {
 
   const htmlString = `
@@ -54,7 +95,28 @@ export function exportHTML(faqs: FAQItem[]) {
 }
 
 
-// -------------- EXPORT PDF --------------
+/**
+ * Export FAQs as PDF
+ *
+ * Generates a formatted PDF document with FAQ data in table format.
+ * Uses jsPDF and autoTable for table layout.
+ *
+ * @param {FAQItem[]} faqs - Array of FAQ items to export
+ *
+ * Features:
+ * - A4 format document
+ * - Title: "FAQ Export"
+ * - Two-column table (Frage/Question, Antwort/Answer)
+ * - Indigo header background
+ * - Optimized column widths for readability
+ * - Top-aligned cell content
+ *
+ * Table Configuration:
+ * - Question column: 180pt width
+ * - Answer column: 340pt width
+ * - Font size: 10pt
+ * - Header color: Indigo (#4f46e5)
+ */
 export function exportPDF(faqs: FAQItem[]) {
     const doc = new jsPDF({ unit: "pt", format: "a4" });
 

@@ -14,8 +14,27 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 
-
-
+/**
+ * Authentication View Component
+ *
+ * Provides user login and registration functionality using Supabase authentication.
+ * Features a tabbed interface to switch between login and registration forms.
+ *
+ * Features:
+ * - Login: Email and password authentication
+ * - Registration: Name, email, and password account creation
+ * - Form validation using Zod schemas
+ * - React Hook Form for form state management
+ * - Toast notifications for success/error feedback
+ * - Loading states during authentication
+ * - Auto-redirect to home page after successful auth
+ * - User data synchronization with database
+ *
+ * Form Validation:
+ * - Email: Valid email format required
+ * - Password: Minimum length and complexity requirements
+ * - Name: Required for registration
+ */
 const AuthView = () => {
 
     const router = useRouter();

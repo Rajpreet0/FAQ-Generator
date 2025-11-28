@@ -9,6 +9,11 @@ import { Trash2, ExternalLink, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
+/**
+ * FAQ Item Interface
+ *
+ * Represents a single FAQ entry with database metadata.
+ */
 interface FaqItem {
   id: string;
   question: string;
@@ -16,6 +21,11 @@ interface FaqItem {
   order: number;
 }
 
+/**
+ * FAQ Set Interface
+ *
+ * Represents a collection of FAQs with metadata like source URL and SEO score.
+ */
 interface FaqSet {
   id: string;
   title: string;
@@ -25,6 +35,21 @@ interface FaqSet {
   faqs: FaqItem[];
 }
 
+/**
+ * Saved FAQs View Component
+ *
+ * Displays all saved FAQ sets for the authenticated user.
+ * Provides functionality to view, delete, and manage saved FAQs.
+ *
+ * Features:
+ * - Lists all saved FAQ sets with metadata
+ * - Shows FAQ count and SEO score for each set
+ * - Delete functionality with confirmation
+ * - Links to source URLs
+ * - Authentication check with redirect prompt
+ * - Loading states for fetching and deletion
+ * - Empty state for users with no saved FAQs
+ */
 const SavedView = () => {
   const user = useAuthStore((s) => s.user);
   const router = useRouter();
@@ -135,22 +160,23 @@ const SavedView = () => {
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
                       <CardTitle className="text-lg">{faqSet.title}</CardTitle>
-                      <CardDescription className="mt-2 flex items-center gap-2">
+                      <CardDescription className="mt-2 space-y-1 flex gap-2">
                         {faqSet.sourceUrl && (
                           <a
                             href={faqSet.sourceUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-1 text-indigo-500 hover:text-indigo-600 transition-colors"
+                            className="flex items-center gap-1 text-indigo-500 hover:text-indigo-600 transition-colors break-all"
                           >
-                            <ExternalLink className="w-4 h-4" />
-                            Quelle
+                            <ExternalLink className="w-4 h-4 shrink-0" />
+                            <span className="text-sm">Quelle</span>
                           </a>
                         )}
+                        <p>●</p>
                         {faqSet.seoScore && (
-                          <span className="text-sm">
-                            • SEO: <span className="font-semibold text-green-600 dark:text-green-400">{faqSet.seoScore}/100</span>
-                          </span>
+                          <div className="text-sm">
+                            SEO Score: <span className="font-semibold text-green-600 dark:text-green-400">{faqSet.seoScore}/100</span>
+                          </div>
                         )}
                       </CardDescription>
                     </div>
@@ -181,7 +207,7 @@ const SavedView = () => {
                           className="p-3 rounded-lg bg-slate-50/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700"
                         >
                           <h4 className="font-semibold text-sm mb-1">{faq.question}</h4>
-                          <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2">
+                          <p className="text-xs text-slate-600 dark:text-slate-400 ">
                             {faq.answer}
                           </p>
                         </div>

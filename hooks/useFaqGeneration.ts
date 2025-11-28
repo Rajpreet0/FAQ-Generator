@@ -1,10 +1,35 @@
 "use client";
 
 import { useFaqStore } from "@/store/faq-store";
+import { useSettingsStore } from "@/store/useSettingsStore";
 import { useEffect, useRef, useState } from "react";
 
+/**
+ * FAQ Generation Hook
+ *
+ * Custom React hook that manages the complete FAQ generation lifecycle including
+ * content extraction, FAQ generation, SEO analysis, and state management.
+ * Handles hydration, loading states, and prevents duplicate API calls.
+ *
+ * @param {string | null} url - The source URL to extract content from and generate FAQs
+ *
+ * @returns {Object} Hook state and actions:
+ *   - faq: Array of generated FAQ items
+ *   - seoData: SEO analysis results or null
+ *   - loading: Boolean indicating FAQ generation status
+ *   - seoLoading: Boolean indicating SEO analysis status
+ *   - clearFaqs: Function to clear all FAQs and reset state
+ *
+ * Features:
+ * - Automatic content extraction from URL
+ * - FAQ generation using user settings (language, count, tone, model)
+ * - SEO analysis of generated FAQs
+ * - Persistent state with hydration handling
+ * - Prevents duplicate generation and analysis
+ */
 export const useFaqGeneration = (url: string | null) => {
     const { faqs: storedFaqs, seoData: storedSeo, setFaqs,  setSeoData ,clearFaqs } = useFaqStore();
+    const {language, faqCount, tone, model} = useSettingsStore();
     const [faq, setFaq] = useState(storedFaqs || []);
     const [loading, setLoading] = useState(faq.length === 0);
     const [seoData, setLocalSeoData] = useState(storedSeo || null);
@@ -13,6 +38,14 @@ export const useFaqGeneration = (url: string | null) => {
 
     const hasGeneratedRef = useRef(false);
     const hasAnalyzedRef = useRef(false);
+
+    // Reset refs when storedFaqs is empty (after clearFaqs)
+    useEffect(() => {
+        if (storedFaqs.length === 0) {
+            hasGeneratedRef.current = false;
+            hasAnalyzedRef.current = false;
+        }
+    }, [storedFaqs.length]);
 
     useEffect(() => {
         const unsub = useFaqStore.persist.onFinishHydration(() => {
@@ -54,18 +87,19 @@ export const useFaqGeneration = (url: string | null) => {
 
                 const genRes = await fetch("/api/generate", {
                     method: "POST",
-                    body: JSON.stringify({ content }),
+                    body: JSON.stringify({ 
+                        content,
+                        language,
+                        faqCount,
+                        tone,
+                        model
+                    }),
                 });
 
                 const data = await genRes.json();
                 const faqs = data.faqs || [];
                 setFaq(faqs);
                 setFaqs(faqs);
-
-                // Store URL for later SEO score update
-                if (typeof window !== 'undefined') {
-                    sessionStorage.setItem('current_faq_url', url);
-                }
             } catch (err) {
                 console.error(err);
             } finally {
@@ -98,28 +132,6 @@ export const useFaqGeneration = (url: string | null) => {
                 const data = await res.json();
                 setLocalSeoData(data);
                 setSeoData(data);
-
-                // Auto-save FAQs with SEO score to database
-                if (typeof window !== 'undefined') {
-                    const savedUrl = sessionStorage.getItem('current_faq_url');
-                    if (savedUrl) {
-                        try {
-                            await fetch('/api/faqs', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({
-                                    title: `FAQs from ${new URL(savedUrl).hostname}`,
-                                    sourceUrl: savedUrl,
-                                    seoScore: data.score,
-                                    faqs: faq
-                                })
-                            });
-                            sessionStorage.removeItem('current_faq_url');
-                        } catch {
-                            console.log('Could not auto-save FAQs (user may not be logged in)');
-                        }
-                    }
-                }
             } catch (err) {
                 console.error("SEO Analysis failed:", err);
             } finally {

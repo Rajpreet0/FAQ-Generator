@@ -2,6 +2,22 @@
 import { motion } from "framer-motion";
 import { CircleQuestionMark } from "lucide-react";
 
+/**
+ * FAQ List Component
+ *
+ * Displays a list of FAQ items with animated cards and hover effects.
+ * Each FAQ card shows a question with an icon and its corresponding answer.
+ *
+ * Features:
+ * - Animated card entrance with framer-motion
+ * - Hover effects with gradient glow
+ * - Responsive design with backdrop blur
+ * - Dark mode support
+ * - Question icon for visual clarity
+ *
+ * @param {Object} props - Component props
+ * @param {Array} props.faq - Array of FAQ objects with question and answer properties
+ */
 const FaqList = ({ faq }: {faq: { question: string; answer: string }[] }) => {
   return (
     <div className="space-y-6">

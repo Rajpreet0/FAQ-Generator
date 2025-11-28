@@ -3,6 +3,28 @@ import { MenuDock } from "@/components/ui/shadcn-io/menu-dock"
 import { useAuthStore } from "@/store/auth-store";
 import { Home, Settings, Save } from 'lucide-react';
 
+/**
+ * Generated Routes Layout Component
+ *
+ * Layout wrapper for protected application routes (/result, /saved, /settings).
+ * Provides a responsive navigation dock for authenticated and public users.
+ *
+ * Features:
+ * - Responsive menu dock (compact on mobile, default on desktop)
+ * - Dynamic menu items based on authentication state
+ * - Fixed bottom positioning for easy access
+ * - Waits for auth hydration before rendering
+ *
+ * Menu Items:
+ * - Authenticated Users: Home, Saved, Settings
+ * - Public Users: Home only
+ *
+ * Responsive Behavior:
+ * - Mobile (<lg): Compact variant menu
+ * - Desktop (≥lg): Default variant menu
+ *
+ * Note: Returns null until auth state is hydrated to prevent flash of incorrect menu
+ */
 const Layout = ({children} : {children: React.ReactNode} ) => {
 
     const user = useAuthStore((s) => s.user);

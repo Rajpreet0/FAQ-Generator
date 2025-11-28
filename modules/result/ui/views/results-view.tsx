@@ -15,6 +15,23 @@ import { useState } from "react";
 import RegenerateModal from "../components/RegenerateModal";
 import { useAuthStore } from "@/store/auth-store";
 
+/**
+ * Results View Component
+ *
+ * Displays generated FAQs and SEO analysis after content extraction and generation.
+ * Provides functionality to save, export, and regenerate FAQs with different parameters.
+ *
+ * Features:
+ * - Displays FAQ list with question-answer pairs
+ * - Shows SEO score analysis with strengths, weaknesses, and recommendations
+ * - Save FAQs to database (requires authentication)
+ * - Export FAQs in multiple formats (JSON, HTML, PDF)
+ * - Regenerate FAQs with new URL or parameters
+ * - Loading states for generation, saving, and SEO analysis
+ *
+ * URL Parameters:
+ * - url: Source URL to extract content from (optional after initial generation)
+ */
 const ResultsView = () => {
   const params = useSearchParams();
   const url = params.get("url");
@@ -34,6 +51,9 @@ const ResultsView = () => {
   const [open, setOpen] = useState(false);
 
   async function handleSaveFaqs() {
+    // Prevent double-clicking
+    if (saveLoading) return;
+
     if (!user) {
       toast.error("Bitte melde dich an, um FAQs zu speichern");
       return;

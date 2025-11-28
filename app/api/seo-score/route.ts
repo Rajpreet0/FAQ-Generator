@@ -5,6 +5,24 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
 });
 
+/**
+ * SEO Score Analysis API Endpoint
+ *
+ * Analyzes FAQ content to determine its SEO impact on the overall website.
+ * Uses OpenAI to evaluate keyword coverage, semantic relevance, user engagement,
+ * and other SEO factors, returning a comprehensive analysis with actionable insights.
+ *
+ * @param {Request} req - The HTTP request containing:
+ *   - faq: Array of FAQ objects with question and answer properties
+ *
+ * @returns {Response} JSON response containing:
+ *   - score: Numeric SEO effectiveness rating (0-100)
+ *   - summary: Overview of SEO impact
+ *   - strengths: Array of positive SEO factors
+ *   - weaknesses: Array of SEO weaknesses or risks
+ *   - recommendations: Array of improvement suggestions
+ *   - estimatedImpact: Overall impact level ('hoch', 'mittel', 'gering')
+ */
 export async function POST(req: Request) {
   const { faq } = await req.json();
 

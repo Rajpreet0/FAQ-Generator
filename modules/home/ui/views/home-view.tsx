@@ -14,6 +14,29 @@ import ThemeToggle from "@/components/ThemeToggle";
 import { useAuthStore } from "@/store/auth-store";
 import AuthAvatar from "@/modules/auth/ui/components/AuthAvatar";
 
+/**
+ * Home View Component
+ *
+ * Landing page for the FAQ Generator application.
+ * Presents the value proposition and provides a quick start interface.
+ *
+ * Features:
+ * - Hero section with animated gradient heading
+ * - URL input for immediate FAQ generation
+ * - Authentication status display (Login button or User Avatar)
+ * - Benefits section showcasing key features
+ * - How It Works section explaining the process
+ * - Final CTA (Call-to-Action) section
+ * - Link to API documentation for developers
+ * - Theme toggle for dark/light mode
+ * - Decorative background glow effects
+ *
+ * User Flow:
+ * 1. Enter a website URL
+ * 2. Click "Kostenlos testen" (Test for free)
+ * 3. Redirect to /result page with URL parameter
+ * 4. FAQ generation begins automatically
+ */
 const HomeView = () => {
   const [url, setUrl] = useState("");
   const user = useAuthStore((s) => s.user);

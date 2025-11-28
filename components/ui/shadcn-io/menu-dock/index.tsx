@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { Home, Settings, Save } from 'lucide-react';
+import { Home } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 type IconComponentType = React.ElementType<{ className?: string }>;
 
@@ -27,8 +27,8 @@ const defaultItems: MenuDockItem[] = [
     { label: 'home', icon: Home },
 ];
 
-export const MenuDock: React.FC<MenuDockProps> = ({ 
-  items, 
+export const MenuDock: React.FC<MenuDockProps> = ({
+  items,
   className,
   variant = 'default',
   orientation = 'horizontal',
@@ -46,14 +46,28 @@ export const MenuDock: React.FC<MenuDockProps> = ({
   }, [items]);
 
   const router = useRouter();
+  const pathname = usePathname();
 
-  
-  const [activeIndex, setActiveIndex] = useState(0);
+  // Find the initial active index based on current pathname
+  const getActiveIndexFromPathname = () => {
+    const index = finalItems.findIndex(item => item.href === pathname);
+    return index >= 0 ? index : 0;
+  };
+
+  const [activeIndex, setActiveIndex] = useState(getActiveIndexFromPathname());
   const [underlineWidth, setUnderlineWidth] = useState(0);
   const [underlineLeft, setUnderlineLeft] = useState(0);
 
   const textRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  // Update active index when pathname changes
+  useEffect(() => {
+    const index = finalItems.findIndex(item => item.href === pathname);
+    if (index >= 0) {
+      setActiveIndex(index);
+    }
+  }, [pathname, finalItems]);
 
   useEffect(() => {
       if (activeIndex >= finalItems.length) {

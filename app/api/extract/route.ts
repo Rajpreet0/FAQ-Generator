@@ -1,6 +1,20 @@
 import * as cheerio from "cheerio";
 import { NextResponse } from "next/server";
 
+/**
+ * Website Content Extraction API Endpoint
+ *
+ * Extracts and processes text content from a given URL using Cheerio.
+ * This endpoint fetches the HTML of a website, parses it, and returns
+ * cleaned text content from the body element.
+ *
+ * @param {Request} req - The HTTP request containing:
+ *   - url: The website URL to extract content from
+ *
+ * @returns {Response} JSON response containing:
+ *   - Success: { content: string } - Cleaned and trimmed text content
+ *   - Error: { error: string } with appropriate status code
+ */
 export async function POST(req: Request) {
   const { url } = await req.json();
 
