@@ -13,6 +13,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+import BackgroundGlow from "@/modules/home/ui/components/BackgroundGlow";
 
 /**
  * Authentication View Component
@@ -86,12 +87,15 @@ const AuthView = () => {
 
   return (
     <main className="
-      min-h-screen flex items-center justify-center 
+      min-h-screen flex items-center justify-center
       px-6 py-12
       bg-gradient-to-br from-slate-50 via-white to-slate-100
       dark:bg-gradient-to-br dark:from-[#0c0c14] dark:via-[#0b0b13] dark:to-[#0c0c17]
       transition-all
+      relative overflow-hidden
     ">
+        {/* Background Glow */}
+        <BackgroundGlow />
 
         <Card className="w-full max-w-md 
         rounded-2xl shadow-xl backdrop-blur-lg
