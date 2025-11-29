@@ -19,6 +19,7 @@ interface SettingsState {
 
     apiKey: string | null;
     apiKeyExpiresAt: string | null;
+    apiCount: number | null;
 
     setEmail: (v: string) => void;
     setName: (v: string) => void;
@@ -29,6 +30,7 @@ interface SettingsState {
     setModel: (v: string) => void;
     setExportFormat: (v: string) => void;
     setApiKey: (key: string | null, expiresAt: string | null) => void;
+    setApiCount: (v: number) => void;
 
     loadSettings: () => Promise<void>;
     saveSettings: () => Promise<boolean>;
@@ -71,6 +73,7 @@ export const useSettingsStore = create(
             exportFormat: "json",
             apiKey: null,
             apiKeyExpiresAt: null,
+            apiCount: null,
 
             // ACTIONS
             setEmail: (v) => set({ email: v }),
@@ -81,6 +84,7 @@ export const useSettingsStore = create(
             setModel: (v) => set({ model: v }),
             setExportFormat: (v) => set({ exportFormat: v }),
             setApiKey: (key, expiresAt) => set({ apiKey: key, apiKeyExpiresAt: expiresAt }),
+            setApiCount: (v) => set({apiCount: v}),
 
             loadSettings: async () => {
                 try {
@@ -95,6 +99,7 @@ export const useSettingsStore = create(
                             exportFormat: data.exportFormat || "json",
                             apiKey: data.apiKey || null,
                             apiKeyExpiresAt: data.apiKeyExpiresAt || null,
+                            apiCount: data.apiCount || null,
                         });
                     }
                 } catch (error) {

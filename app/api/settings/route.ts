@@ -36,10 +36,16 @@ export async function GET() {
         tone: "professional",
         model: "gpt-4o-mini",
         exportFormat: "json",
+        apiKey: null,
+        apiKeyExpiresAt: null,
+        apiCount: 0,
       });
     }
 
-    return NextResponse.json(settings);
+    return NextResponse.json({
+      ...settings,
+      apiCount: settings.apiRequestCount,
+    });
   } catch (error) {
     console.error("Error fetching settings:", error);
     return NextResponse.json(
