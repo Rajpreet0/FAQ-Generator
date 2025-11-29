@@ -59,6 +59,7 @@ const SettingsView = () => {
   const {
     apiKey,
     apiKeyExpiresAt,
+    apiCount,
 
     setEmail,
     setName,
@@ -241,6 +242,12 @@ const SettingsView = () => {
                       <span className="opacity-70">Gültig bis:</span>
                       <span className={`font-medium ${isKeyExpired() ? "text-red-600 dark:text-red-400" : "text-green-600 dark:text-green-400"}`}>
                         {formatExpiryDate(apiKeyExpiresAt)}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="opacity-70">Anfragen: </span>
+                      <span className="opacity-50">
+                         {apiCount}/15
                       </span>
                     </div>
                   </>
