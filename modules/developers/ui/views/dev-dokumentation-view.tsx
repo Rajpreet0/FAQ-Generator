@@ -91,6 +91,7 @@ const DevDokumentationView = () => {
                     <pre className="bg-slate-900 text-slate-100 p-4 rounded-lg text-sm">
                         POST {apiUrl}
                     </pre>
+                    {/** biome-ignore lint/a11y/useButtonType: <explanation> */}
                     <button
                         className="absolute right-3 top-3 text-white"
                         onClick={() => copy(`POST ${apiUrl}`)}
@@ -189,7 +190,8 @@ const DevDokumentationView = () => {
                             }'`}
                     </pre>
 
-                    <button
+                    {/** biome-ignore lint/a11y/useButtonType: <explanation> */}
+<button
                         className="absolute right-3 top-3 text-white"
                         onClick={() =>
                         copy(`curl -X POST "${apiUrl}" -H "Authorization: Bearer YOUR_API_KEY" -H "Content-Type: application/json" -d '{ "url": "https://example.com" }'`)
@@ -223,6 +225,7 @@ const DevDokumentationView = () => {
                         const data = await res.json();
                         console.log(data);`}
                     </pre>
+                    {/** biome-ignore lint/a11y/useButtonType: <explanation> */}
                     <button
                         className="absolute right-3 top-3 text-white"
                         onClick={() =>
@@ -257,6 +260,7 @@ const DevDokumentationView = () => {
                             print(res.json())`}
                     </pre>
 
+                    {/** biome-ignore lint/a11y/useButtonType: <explanation> */}
                     <button
                         className="absolute right-3 top-3 text-white"
                         onClick={() =>

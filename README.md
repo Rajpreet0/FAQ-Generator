@@ -1,36 +1,72 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FAQ-Generator  
+**Produktionsreife Micro-SaaS zur automatisierten FAQ-Erstellung**
 
-## Getting Started
+## 🚀 Projektübersicht  
 
-First, run the development server:
+Der **FAQ-Generator** ist eine Micro-SaaS, mit der strukturierte, mehrsprachige FAQ-Sektionen  
+automatisiert erstellt, angepasst, gespeichert und exportiert werden können.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Der erste **MVP ist bereits online** und produktiv nutzbar.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Die Anwendung richtet sich an Website-Betreiber, SaaS-Gründer und Entwickler,  
+die FAQs effizient generieren und flexibel in ihre Produkte integrieren möchten.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## ❓ Problem  
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+FAQ-Bereiche sind für SEO, Conversion und Support essenziell –  
+werden aber häufig:
+- manuell erstellt  
+- schlecht gepflegt  
+- nicht wiederverwendet  
+- hardcoded in Webseiten eingebaut  
 
-## Learn More
+Besonders bei mehrsprachigen Seiten oder wachsenden Produkten wird dies schnell unübersichtlich.
 
-To learn more about Next.js, take a look at the following resources:
+## ✅ Lösung  
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Der FAQ-Generator bietet eine zentrale, flexible Lösung zur:
+- Erstellung  
+- Verwaltung  
+- Individualisierung  
+- Integration  
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+von FAQ-Inhalten – vollständig webbasiert und skalierbar.
 
-## Deploy on Vercel
+## 🧩 Features (MVP)  
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+✅ **Automatische FAQ-Generierung**  
+✅ **Mehrsprachige Generierung**  
+✅ **Speichern & Verwalten von FAQs**  
+✅ **Individuelle Parameter (z. B. Ton, Länge, Struktur)**  
+✅ **Export-Funktionen** (z. B. HTML / JSON / PDF)  
+✅ **API-Zugriff** zur Integration in externe Systeme  
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🔧 Technischer Überblick  
+
+- **Framework:** Next.js  
+- **Sprache:** TypeScript  
+- **Datenerhaltung:** PostgreSQL - (Supabase)
+
+Der Stack wurde bewusst modern und skalierbar gewählt,  
+um zukünftige Erweiterungen problemlos integrieren zu können.
+
+## 🎯 Zielgruppe  
+
+- SaaS-Produkte & Startups  
+- Agenturen  
+- Content- & SEO-Teams  
+- Entwickler mit Bedarf an dynamischen FAQ-Sektionen  
+
+## 📈 Projektstatus  
+
+**Status:** ✅ Live – MVP in Produktion  
+ 
+
+## 💡 Motivation  
+
+Der FAQ-Generator wurde entwickelt, um ein reales, wiederkehrendes Problem  
+digitale Produkte pragmatisch zu lösen.
+
+## 📄 Lizenz  
+
+MIT License
